@@ -1,0 +1,22 @@
+/* responsive.css */
+
+/* Thiết lập các biến CSS để dễ quản lý con số */
+:root {
+  --bp-tablet: 800px;  /* Ngưỡng Tablet theo yêu cầu */
+  --bp-desktop: 1200px; /* Ngưỡng Desktop theo yêu cầu */
+}
+
+/* Các class ẩn/hiện nhanh */
+.mobile-only { display: block; }
+.tablet-up { display: none; }
+
+@media screen and (min-width: 800px) {
+  .mobile-only { display: none; }
+  .tablet-up { display: block; }
+  .grid-layout { display: grid; grid-template-columns: 1fr 1fr; } /* Chia đôi cho tablet[cite: 1] */
+}
+
+@media screen and (min-width: 1200px) {
+  .desktop-up { display: block; }
+  .grid-layout { grid-template-columns: repeat(4, 1fr); } /* Chia 4 cho desktop[cite: 1] */
+}

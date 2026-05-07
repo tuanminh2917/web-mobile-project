@@ -1,0 +1,29 @@
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+footer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    background-color: darkblue;
+    color: white;
+}
+
+footer .footer-items {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap; /* Cho phép các mục nhảy dòng nếu màn hình quá hẹp */
+    margin-bottom: 10px;
+    gap: 15px;
+}
+
+footer .footer-items li { list-style: none; }
+footer .footer-items li a { color: white; text-decoration: none; }
+footer .footer-items li a:hover { text-decoration: underline; }

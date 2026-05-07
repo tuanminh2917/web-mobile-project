@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="../assets/register.css">
+    <link rel="stylesheet" href="../assets/responsive.css">
+    <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+    <%- include('components/header') %>
+    <main>
+        <div class="register-container">
+            <h2>Register</h2>
+            
+            <form>
+                <!-- Hàng 1: Full Name và DOB -->
+                <div class="form-row">
+                    <input type="text" placeholder="Full Name" class="flex-2">
+                    <input type="text" placeholder="DOB" class="flex-1">
+                </div>
+
+                <!-- Hàng 2: Email và Phone -->
+                <div class="form-row">
+                    <input type="email" placeholder="Email" class="flex-1">
+                    <input type="text" placeholder="Phone" class="flex-1">
+                </div>
+
+                <!-- Hàng 3: Username -->
+                <div class="form-row">
+                    <input type="text" placeholder="Username">
+                </div>
+
+                <!-- Hàng 4: Password -->
+                <div class="form-row">
+                    <input type="password" placeholder="Password">
+                </div>
+
+                <!-- Nút bấm -->
+                <div class="btn-container">
+                    <button type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <%- include('components/footer') %>
+</body>
+</html>

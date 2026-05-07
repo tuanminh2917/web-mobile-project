@@ -1,0 +1,91 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.logo, .account {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.account #login {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: solid 1px #007BFF;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.account #register {
+    padding: 10px 20px;
+    background-color: #28A745;
+    color: white;
+    border: solid 1px #28A745;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.account #login:hover {
+    background-color: rgba(0, 123, 255, 0.8);
+}
+
+.account #register:hover {
+    background-color: rgba(40, 167, 69, 0.8);
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 40px 20px;
+}
+
+/* Điều chỉnh container linh hoạt */
+.login-container {
+    background-color: #d3d3d3;
+    padding: 25px;
+    border: 1px solid #999;
+    width: 90%;         /* Chiếm 90% chiều rộng màn hình nhỏ */
+    max-width: 350px;    /* Không vượt quá 350px trên màn hình lớn */
+}
+
+.login-container h2 {
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: normal;
+    margin-bottom: 25px;
+}
+
+.form-row {
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn-container button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-container button:hover {
+    background-color: #cc0000;
+}

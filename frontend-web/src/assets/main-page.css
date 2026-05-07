@@ -1,0 +1,117 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+
+.logo, .account {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.account #login, .account #register {
+    padding: 10px 20px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.account #login { background-color: #007BFF; border: solid 1px #007BFF; }
+.account #register { background-color: #28A745; border: solid 1px #28A745; }
+
+.account #login:hover { background-color: rgba(0, 123, 255, 0.8); }
+.account #register:hover { background-color: rgba(40, 167, 69, 0.8); }
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+    gap: 40px;
+}
+
+.now-showing, .coming-soon {
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* Movie list mặc định cho Mobile (1 cột) */
+.movie-list {
+    display: grid;
+    grid-template-columns: 1fr; /* Mặc định 1 cột cho mobile */
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Các thuộc tính trang trí giữ nguyên */
+.movie-item {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+    padding-bottom: 15px;
+}
+
+.movie-item img {
+    width: 100%;
+    height: auto;      /* Thay đổi để ảnh co giãn theo chiều rộng */
+    max-height: 300px;  /* Giới hạn chiều cao tối đa */
+    object-fit: cover;
+}
+
+.movie-item h3 { font-size: 16px; margin: 10px 5px; }
+.movie-item p { font-size: 14px; color: #666; padding: 0 10px; }
+
+/* Carousel linh hoạt */
+.carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    overflow: hidden;
+}
+
+.carousel-wrapper {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item { min-width: 100%; }
+.carousel-item img { width: 100%; display: block; }
+
+.prev-btn, .next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.next-btn { right: 10px; }
+.prev-btn { left: 10px; }
+
+.dots-container {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.dot {
+    height: 12px;
+    width: 12px;
+    margin: 0 5px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.dot.active { background-color: #fff; }
