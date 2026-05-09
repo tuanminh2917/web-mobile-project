@@ -11,7 +11,6 @@ Dự án được tổ chức theo mô hình Monorepo giúp quản lý tập tru
 - **/frontend-web**: Website dành cho khách hàng và quản trị viên (Admin).
 - **/mobile-app**: Ứng dụng di động dành cho người dùng.
 - **/database**: Chứa các bản thiết kế SQL (ID dạng chuỗi) và script khởi tạo.
-- **/docs**: Tài liệu kỹ thuật, API specification và sơ đồ ERD.
 
 ---
 
