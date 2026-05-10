@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý người dùng - Admin</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="../../assets/responsive.css">
+  <link rel="stylesheet" href="../../assets/common.css">
+</head>
+<body>
+  <%- include('../../components/header', { currentPage: 'admin' }) %>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand"><h2><span>A</span>dmin</h2></div>
+      <a href="/admin/dashboard" class="nav-item"><span class="icon">&#9632;</span> <span>Dashboard</span></a>
+      <a href="/admin/movies" class="nav-item"><span class="icon">&#127910;</span> <span>Quản lý phim</span></a>
+      <a href="/admin/screenings" class="nav-item"><span class="icon">&#128197;</span> <span>Quản lý suất chiếu</span></a>
+      <a href="/admin/bookings" class="nav-item"><span class="icon">&#128203;</span> <span>Quản lý đặt vé</span></a>
+      <a href="/admin/users" class="nav-item active"><span class="icon">&#128101;</span> <span>Quản lý người dùng</span></a>
+      <a href="/" class="nav-item"><span class="icon">&#8592;</span> <span>Về trang chủ</span></a>
+    </aside>
+
+    <div class="admin-content">
+      <div class="admin-toolbar">
+        <h1>Quản lý người dùng</h1>
+        <div class="search-box">
+          <input type="text" placeholder="Tìm người dùng..." id="searchInput">
+        </div>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Tên đăng nhập</th>
+            <th>Vai trò</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof users !== 'undefined' && users.length) { %>
+            <% users.forEach(u => { %>
+              <tr>
+                <td><%= u.UserID %></td>
+                <td><%= u.FullName %></td>
+                <td><%= u.Email %></td>
+                <td><%= u.Phone %></td>
+                <td><%= u.Username %></td>
+                <td>
+                  <span class="badge <%= u.Role === 'Admin' ? 'active' : 'soon' %>">
+                    <%= u.Role === 'Admin' ? 'Admin' : 'Khách hàng' %>
+                  </span>
+                </td>
+                <td class="actions">
+                  <button class="edit-btn">Sửa</button>
+                  <button class="delete-btn" onclick="if(confirm('Xóa người dùng?'))alert('Đã xóa')">Xóa</button>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Chưa có người dùng</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%- include('../../components/footer') %>
+  <script src="../../js/main.js"></script>
+  <script>
+    document.getElementById('searchInput')?.addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      document.querySelectorAll('.admin-table tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

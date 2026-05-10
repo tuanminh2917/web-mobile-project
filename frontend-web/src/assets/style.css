@@ -1,0 +1,111 @@
+:root {
+  --primary: #e71a0f;
+  --primary-dark: #c0140a;
+  --secondary: #0f1a2e;
+  --accent: #ffd700;
+  --bg-dark: #0d0d0d;
+  --bg-card: #1a1a2e;
+  --bg-section: #16213e;
+  --text-light: #ffffff;
+  --text-muted: #aaa;
+  --text-body: #e0e0e0;
+  --border-color: #333;
+  --font-main: 'Segoe UI', Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-dark);
+  color: var(--text-body);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--accent); }
+
+img { max-width: 100%; height: auto; }
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(231,26,15,0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-light);
+  border: 2px solid var(--primary);
+}
+.btn-secondary:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #000;
+}
+.btn-accent:hover {
+  background: #e6c200;
+}
+
+.btn-sm { padding: 6px 16px; font-size: 13px; }
+.btn-lg { padding: 14px 36px; font-size: 17px; }
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 24px;
+  position: relative;
+  padding-bottom: 12px;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #666; }

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý phim - Admin</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="../../assets/responsive.css">
+  <link rel="stylesheet" href="../../assets/common.css">
+</head>
+<body>
+  <%- include('../../components/header', { currentPage: 'admin' }) %>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand"><h2><span>A</span>dmin</h2></div>
+      <a href="/admin/dashboard" class="nav-item"><span class="icon">&#9632;</span> <span>Dashboard</span></a>
+      <a href="/admin/movies" class="nav-item active"><span class="icon">&#127910;</span> <span>Quản lý phim</span></a>
+      <a href="/admin/screenings" class="nav-item"><span class="icon">&#128197;</span> <span>Quản lý suất chiếu</span></a>
+      <a href="/admin/bookings" class="nav-item"><span class="icon">&#128203;</span> <span>Quản lý đặt vé</span></a>
+      <a href="/admin/users" class="nav-item"><span class="icon">&#128101;</span> <span>Quản lý người dùng</span></a>
+      <a href="/" class="nav-item"><span class="icon">&#8592;</span> <span>Về trang chủ</span></a>
+    </aside>
+
+    <div class="admin-content">
+      <div class="admin-toolbar">
+        <h1>Quản lý phim</h1>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div class="search-box">
+            <input type="text" placeholder="Tìm phim..." id="searchInput">
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('addModal').style.display='block'">+ Thêm phim</button>
+        </div>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Poster</th>
+            <th>Tên phim</th>
+            <th>Thể loại</th>
+            <th>Thời lượng</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof movies !== 'undefined' && movies.length) { %>
+            <% movies.forEach(m => { %>
+              <tr>
+                <td><%= m.MovieID %></td>
+                <td><img src="<%= m.PosterURL || '/assets/poster-placeholder.jpg' %>" style="width:40px;height:56px;object-fit:cover;border-radius:4px;"></td>
+                <td><%= m.Title %></td>
+                <td><%= m.Genre %></td>
+                <td><%= m.Duration %> phút</td>
+                <td>
+                  <span class="badge <%= m.Status === 'On Going' ? 'active' : m.Status === 'Up Coming' ? 'soon' : 'inactive' %>">
+                    <%= m.Status === 'On Going' ? 'Đang chiếu' : m.Status === 'Up Coming' ? 'Sắp chiếu' : 'Ngừng chiếu' %>
+                  </span>
+                </td>
+                <td class="actions">
+                  <button class="edit-btn">Sửa</button>
+                  <button class="delete-btn" onclick="if(confirm('Xóa phim này?'))alert('Đã xóa')">Xóa</button>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Chưa có phim nào</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Movie Modal -->
+  <div id="addModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;padding:60px 20px;overflow-y:auto;">
+    <div style="max-width:600px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
+      <h2 style="color:var(--text-light);margin-bottom:20px;">Thêm phim mới</h2>
+      <form action="/admin/movies" method="POST" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="grid-column:span 2;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Tên phim</label>
+          <input type="text" name="title" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Thể loại</label>
+          <input type="text" name="genre" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Thời lượng (phút)</label>
+          <input type="number" name="duration" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Ngày khởi chiếu</label>
+          <input type="date" name="releaseDate" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Trạng thái</label>
+          <select name="status" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+            <option value="On Going">Đang chiếu</option>
+            <option value="Up Coming">Sắp chiếu</option>
+            <option value="Stoped">Ngừng chiếu</option>
+          </select>
+        </div>
+        <div style="grid-column:span 2;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Mô tả</label>
+          <textarea name="description" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);min-height:80px;"></textarea>
+        </div>
+        <div style="grid-column:span 2;display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('addModal').style.display='none'">Hủy</button>
+          <button type="submit" class="btn btn-primary">Thêm phim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <%- include('../../components/footer') %>
+  <script src="../../js/main.js"></script>
+  <script>
+    document.getElementById('searchInput')?.addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      document.querySelectorAll('.admin-table tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

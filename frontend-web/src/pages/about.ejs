@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giới thiệu - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
+  <style>
+    .about-page {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .about-page h1 {
+      color: var(--text-light);
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .about-page .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+    .about-section {
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+    .about-section h2 {
+      color: var(--text-light);
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    .about-section h2 span { color: var(--primary); }
+    .about-section p {
+      color: var(--text-body);
+      line-height: 1.8;
+      margin-bottom: 8px;
+    }
+    .about-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    .about-section ul li {
+      color: var(--text-muted);
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .about-section ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+    }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .stats-bar .stat {
+      text-align: center;
+      padding: 20px;
+      background: var(--bg-dark);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .stats-bar .stat .num {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stats-bar .stat .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../components/header', { currentPage: 'about' }) %>
+
+  <main>
+    <div class="about-page">
+      <h1>Về chúng tôi</h1>
+      <p class="subtitle">Cinema Booking System - Hệ thống đặt vé xem phim trực tuyến</p>
+
+      <div class="about-section">
+        <h2>Giới thiệu chung</h2>
+        <p>
+          Chào mừng bạn đến với <span style="color:var(--primary);font-weight:600;">Cinema</span> - hệ thống đặt vé xem phim trực tuyến 
+          của Trung tâm Chiếu phim Quốc gia. Chúng tôi mang đến trải nghiệm đặt vé nhanh chóng, tiện lợi với đầy đủ thông tin 
+          về phim, lịch chiếu và lựa chọn ghế ngồi theo thời gian thực.
+        </p>
+      </div>
+
+      <div class="about-section">
+        <h2>Hệ thống <span>phòng chiếu</span></h2>
+        <ul>
+          <li>5 phòng chiếu chuẩn 2D (2 phòng lớn, 3 phòng nhỏ)</li>
+          <li>Phòng lớn: ~150 ghế với đầy đủ ghế thường, VIP và ghế đôi</li>
+          <li>Phòng nhỏ: ~100 ghế, không gian ấm cúng</li>
+        </ul>
+        <div class="stats-bar">
+          <div class="stat">
+            <div class="num view-counter" data-count="15000">0</div>
+            <div class="label">Lượt truy cập</div>
+          </div>
+          <div class="stat">
+            <div class="num">5</div>
+            <div class="label">Phòng chiếu</div>
+          </div>
+          <div class="stat">
+            <div class="num">2</div>
+            <div class="label">Phòng lớn</div>
+          </div>
+          <div class="stat">
+            <div class="num">3</div>
+            <div class="label">Phòng nhỏ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <h2>Quy trình đặt vé</h2>
+        <ol style="color:var(--text-body);line-height:2;padding-left:20px;">
+          <li><strong style="color:var(--text-light);">Chọn phim</strong> - Xem danh sách phim đang chiếu và sắp chiếu</li>
+          <li><strong style="color:var(--text-light);">Chọn suất chiếu</strong> - Chọn ngày, giờ và phòng chiếu phù hợp</li>
+          <li><strong style="color:var(--text-light);">Chọn ghế</strong> - Tương tác trực tiếp với sơ đồ ghế theo thời gian thực</li>
+          <li><strong style="color:var(--text-light);">Thanh toán</strong> - Quét mã QR và xác nhận thanh toán</li>
+        </ol>
+      </div>
+
+      <div class="about-section">
+        <h2>Liên hệ</h2>
+        <p><strong>Trung tâm Chiếu phim Quốc gia</strong></p>
+        <p>Địa chỉ: 87 Láng Hạ, Quận Đống Đa, Hà Nội</p>
+        <p>Điện thoại: 024 1234 5678</p>
+        <p>Email: info@cinema.vn</p>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/main.js"></script>
+</body>
+</html>

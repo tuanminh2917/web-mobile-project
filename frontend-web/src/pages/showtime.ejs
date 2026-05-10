@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch chiếu - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/showtime.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+  <%- include('../components/header', { currentPage: 'showtime' }) %>
+
+  <main>
+    <div class="showtime-page">
+      <h1>Lịch chiếu phim</h1>
+      <p class="subtitle">Chọn phim và suất chiếu phù hợp với bạn</p>
+
+      <div class="movie-selector">
+        <label style="color:var(--text-muted);font-size:14px;display:block;margin-bottom:6px;">Chọn phim</label>
+        <select name="movie" id="movieFilter">
+          <option value="">Tất cả phim</option>
+          <% if (typeof movies !== 'undefined') { %>
+            <% movies.forEach(m => { %>
+              <option value="<%= m.MovieID %>"><%= m.Title %></option>
+            <% }); %>
+          <% } %>
+        </select>
+      </div>
+
+      <div class="date-tabs">
+        <% if (typeof dates !== 'undefined') { %>
+          <% dates.forEach((date, i) => { %>
+            <div class="date-tab <%= i === 0 ? 'active' : '' %>" data-date="<%= date %>">
+              <span class="day"><%= new Date(date).toLocaleDateString('vi-VN', { weekday: 'short' }) %></span>
+              <span class="date-num"><%= new Date(date).getDate() %></span>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="date-tab active"><span class="day">Hôm nay</span><span class="date-num">10</span></div>
+          <div class="date-tab"><span class="day">Mai</span><span class="date-num">11</span></div>
+          <div class="date-tab"><span class="day">T2</span><span class="date-num">12</span></div>
+          <div class="date-tab"><span class="day">T3</span><span class="date-num">13</span></div>
+          <div class="date-tab"><span class="day">T4</span><span class="date-num">14</span></div>
+        <% } %>
+      </div>
+
+      <div class="screening-list">
+        <% if (typeof screenings !== 'undefined' && screenings.length) { %>
+          <% screenings.forEach(s => { %>
+            <div class="screening-card" data-movie="<%= s.MovieID %>">
+              <img src="<%= s.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= s.MovieTitle %>" class="movie-thumb">
+              <div class="info">
+                <h3><%= s.MovieTitle %></h3>
+                <p><%= s.RoomName %> &middot; <%= s.SeatType || '2D' %></p>
+                <p><%= s.Genre %> &middot; <%= s.Duration %> phút</p>
+              </div>
+              <div class="time-price">
+                <div class="time"><%= new Date(s.StartTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %></div>
+                <div class="price"><%= s.BasePrice.toLocaleString() %>đ</div>
+                <a href="/book/<%= s.ScreeningID %>" class="btn btn-sm btn-primary" style="margin-top:8px;">Chọn ghế</a>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="screening-card">
+            <img src="/assets/movie1.jpg" alt="Movie" class="movie-thumb">
+            <div class="info">
+              <h3>The Conjuring: Xác Ướp</h3>
+              <p>Phòng 1 (Phòng lớn) &middot; 2D</p>
+              <p>Kinh dị &middot; 120 phút</p>
+            </div>
+            <div class="time-price">
+              <div class="time">09:00</div>
+              <div class="price">50,000đ</div>
+              <a href="/book/1" class="btn btn-sm btn-primary" style="margin-top:8px;">Chọn ghế</a>
+            </div>
+          </div>
+          <div class="screening-card">
+            <img src="/assets/movie2.jpg" alt="Movie" class="movie-thumb">
+            <div class="info">
+              <h3>Lật Mặt 7</h3>
+              <p>Phòng 2 (Phòng lớn) &middot; 2D</p>
+              <p>Tâm lý &middot; 120 phút</p>
+            </div>
+            <div class="time-price">
+              <div class="time">14:30</div>
+              <div class="price">60,000đ</div>
+              <a href="/book/2" class="btn btn-sm btn-primary" style="margin-top:8px;">Chọn ghế</a>
+            </div>
+          </div>
+          <div class="screening-card">
+            <img src="/assets/movie3.jpg" alt="Movie" class="movie-thumb">
+            <div class="info">
+              <h3>Avengers: Endgame</h3>
+              <p>Phòng 3 (Phòng nhỏ) &middot; 2D</p>
+              <p>Hành động &middot; 181 phút</p>
+            </div>
+            <div class="time-price">
+              <div class="time">19:30</div>
+              <div class="price">90,000đ</div>
+              <a href="/book/3" class="btn btn-sm btn-primary" style="margin-top:8px;">Chọn ghế</a>
+            </div>
+          </div>
+          <div class="screening-card">
+            <img src="/assets/movie1.jpg" alt="Movie" class="movie-thumb">
+            <div class="info">
+              <h3>The Conjuring: Xác Ướp</h3>
+              <p>Phòng 4 (Phòng nhỏ) &middot; 2D</p>
+              <p>Kinh dị &middot; 120 phút</p>
+            </div>
+            <div class="time-price">
+              <div class="time">22:00</div>
+              <div class="price">100,000đ</div>
+              <a href="/book/4" class="btn btn-sm btn-primary" style="margin-top:8px;">Chọn ghế</a>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/main.js"></script>
+  <script>
+    document.getElementById('movieFilter')?.addEventListener('change', function() {
+      const val = this.value;
+      document.querySelectorAll('.screening-card').forEach(card => {
+        if (!val || card.dataset.movie === val) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

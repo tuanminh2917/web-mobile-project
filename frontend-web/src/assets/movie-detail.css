@@ -1,0 +1,108 @@
+.movie-detail {
+  display: flex;
+  gap: 40px;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.movie-poster {
+  flex: 0 0 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+.movie-poster img { width: 100%; display: block; }
+.movie-info { flex: 1; }
+.movie-info h1 {
+  font-size: 32px;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+.movie-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.movie-meta .tag {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  border: 1px solid var(--border-color);
+}
+.movie-meta .tag.rating { color: var(--accent); border-color: var(--accent); }
+.movie-meta .tag.censorship { color: var(--primary); border-color: var(--primary); }
+.movie-desc {
+  color: var(--text-body);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+.movie-extra { margin-bottom: 24px; }
+.movie-extra p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.movie-extra span { color: var(--text-light); }
+.showtime-section { margin-top: 30px; }
+.showtime-section h3 {
+  color: var(--text-light);
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+.date-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.date-tab {
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+  text-align: center;
+  min-width: 80px;
+}
+.date-tab .day { display: block; font-size: 13px; }
+.date-tab .date-num { display: block; font-size: 20px; font-weight: 700; }
+.date-tab:hover { border-color: var(--primary); color: var(--text-light); }
+.date-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.room-showtimes { margin-bottom: 24px; }
+.room-showtimes h4 {
+  color: var(--text-light);
+  font-size: 16px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+.showtime-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.showtime-btn {
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+.showtime-btn .time { display: block; font-size: 16px; font-weight: 600; }
+.showtime-btn .price { display: block; font-size: 12px; color: var(--accent); margin-top: 2px; }
+.showtime-btn:hover { border-color: var(--primary); background: rgba(231,26,15,0.1); }
+
+@media (max-width: 768px) {
+  .movie-detail { flex-direction: column; align-items: center; }
+  .movie-poster { flex: 0 0 auto; max-width: 250px; }
+}

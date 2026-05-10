@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Cinema</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="../../assets/responsive.css">
+  <link rel="stylesheet" href="../../assets/common.css">
+</head>
+<body>
+  <%- include('../../components/header', { currentPage: 'admin' }) %>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <h2><span>A</span>dmin</h2>
+      </div>
+      <a href="/admin/dashboard" class="nav-item active">
+        <span class="icon">&#9632;</span> <span>Dashboard</span>
+      </a>
+      <a href="/admin/movies" class="nav-item">
+        <span class="icon">&#127910;</span> <span>Quản lý phim</span>
+      </a>
+      <a href="/admin/screenings" class="nav-item">
+        <span class="icon">&#128197;</span> <span>Quản lý suất chiếu</span>
+      </a>
+      <a href="/admin/bookings" class="nav-item">
+        <span class="icon">&#128203;</span> <span>Quản lý đặt vé</span>
+      </a>
+      <a href="/admin/users" class="nav-item">
+        <span class="icon">&#128101;</span> <span>Quản lý người dùng</span>
+      </a>
+      <a href="/" class="nav-item">
+        <span class="icon">&#8592;</span> <span>Về trang chủ</span>
+      </a>
+    </aside>
+
+    <div class="admin-content">
+      <h1>Dashboard</h1>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Tổng lượt xem</div>
+          <div class="stat-value"><%= stats.viewCount || 0 %></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Phim đang chiếu</div>
+          <div class="stat-value"><%= stats.moviesCount || 0 %></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Đơn đặt vé hôm nay</div>
+          <div class="stat-value"><%= stats.todayBookings || 0 %></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Doanh thu hôm nay</div>
+          <div class="stat-value"><%= (stats.todayRevenue || 0).toLocaleString() %>đ</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Người dùng</div>
+          <div class="stat-value"><%= stats.usersCount || 0 %></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Tổng doanh thu</div>
+          <div class="stat-value"><%= (stats.totalRevenue || 0).toLocaleString() %>đ</div>
+        </div>
+      </div>
+
+      <h2 class="section-title" style="font-size:20px;">Đặt vé gần đây</h2>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Phim</th>
+            <th>Ghế</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof recentBookings !== 'undefined' && recentBookings.length) { %>
+            <% recentBookings.forEach(b => { %>
+              <tr>
+                <td>#BK<%= b.BookingID %></td>
+                <td><%= b.FullName || b.Username %></td>
+                <td><%= b.MovieTitle %></td>
+                <td><%= b.Seats %></td>
+                <td><%= b.TotalPrice.toLocaleString() %>đ</td>
+                <td><span class="badge <%= b.Status === 'Paid' ? 'active' : b.Status === 'Pending' ? 'soon' : 'inactive' %>">
+                  <%= b.Status === 'Paid' ? 'Đã thanh toán' : b.Status === 'Pending' ? 'Chờ' : 'Đã hủy' %>
+                </span></td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Chưa có giao dịch</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%- include('../../components/footer') %>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

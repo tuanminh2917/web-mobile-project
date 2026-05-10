@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh toán - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/checkout.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+  <%- include('../components/header', { currentPage: 'booking' }) %>
+
+  <main>
+    <div class="checkout-page">
+      <h1>Xác nhận thanh toán</h1>
+
+      <div class="checkout-grid">
+        <div class="checkout-section">
+          <h2>Thông tin đặt vé</h2>
+          <div class="info-row">
+            <span>Phim</span>
+            <span class="value"><%= movie.Title %></span>
+          </div>
+          <div class="info-row">
+            <span>Phòng chiếu</span>
+            <span class="value"><%= roomName %></span>
+          </div>
+          <div class="info-row">
+            <span>Suất chiếu</span>
+            <span class="value"><%= new Date(startTime).toLocaleString('vi-VN') %></span>
+          </div>
+          <div class="info-row">
+            <span>Ghế</span>
+            <span class="value"><%= seats.map(s => s.row + s.number).join(', ') %></span>
+          </div>
+          <hr class="divider">
+          <% seats.forEach(s => { %>
+            <div class="info-row">
+              <span>Ghế <%= s.row %><%= s.number %> (<%= s.type === 'regular' ? 'Thường' : s.type === 'vip' ? 'VIP' : 'Đôi' %>)</span>
+              <span class="value price"><%= s.price.toLocaleString() %>đ</span>
+            </div>
+          <% }); %>
+          <hr class="divider">
+          <div class="total-row">
+            <span>Tổng cộng</span>
+            <span class="amount"><%= total.toLocaleString() %>đ</span>
+          </div>
+        </div>
+
+        <div class="checkout-section">
+          <h2>Thanh toán</h2>
+          <div class="qr-section">
+            <div class="qr-placeholder">
+              <img src="/assets/qr-placeholder.png" alt="QR Code">
+            </div>
+            <p>Quét mã QR để thanh toán qua ứng dụng ngân hàng</p>
+            <p style="font-size:12px;color:var(--text-muted);">Số tiền: <strong style="color:var(--accent);"><%= total.toLocaleString() %>đ</strong></p>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Nội dung chuyển khoản: <strong style="color:var(--text-light);">BOOKING<%= bookingID %></strong></p>
+            <hr class="divider">
+            <form action="/book/<%= screeningID %>/pay" method="POST">
+              <input type="hidden" name="bookingID" value="<%= bookingID %>">
+              <button type="submit" class="btn btn-primary payment-btn">Xác nhận đã thanh toán</button>
+            </form>
+            <p style="margin-top:12px;font-size:12px;color:var(--text-muted);">Vé sẽ được giữ trong 10 phút. Vui lòng thanh toán trước khi hết giờ.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/main.js"></script>
+</body>
+</html>

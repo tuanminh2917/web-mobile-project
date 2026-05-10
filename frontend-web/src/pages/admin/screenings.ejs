@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý suất chiếu - Admin</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="../../assets/responsive.css">
+  <link rel="stylesheet" href="../../assets/common.css">
+</head>
+<body>
+  <%- include('../../components/header', { currentPage: 'admin' }) %>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand"><h2><span>A</span>dmin</h2></div>
+      <a href="/admin/dashboard" class="nav-item"><span class="icon">&#9632;</span> <span>Dashboard</span></a>
+      <a href="/admin/movies" class="nav-item"><span class="icon">&#127910;</span> <span>Quản lý phim</span></a>
+      <a href="/admin/screenings" class="nav-item active"><span class="icon">&#128197;</span> <span>Quản lý suất chiếu</span></a>
+      <a href="/admin/bookings" class="nav-item"><span class="icon">&#128203;</span> <span>Quản lý đặt vé</span></a>
+      <a href="/admin/users" class="nav-item"><span class="icon">&#128101;</span> <span>Quản lý người dùng</span></a>
+      <a href="/" class="nav-item"><span class="icon">&#8592;</span> <span>Về trang chủ</span></a>
+    </aside>
+
+    <div class="admin-content">
+      <div class="admin-toolbar">
+        <h1>Quản lý suất chiếu</h1>
+        <button class="btn btn-primary" onclick="document.getElementById('addModal').style.display='block'">+ Thêm suất chiếu</button>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Phim</th>
+            <th>Phòng</th>
+            <th>Giờ bắt đầu</th>
+            <th>Giờ kết thúc</th>
+            <th>Giá cơ bản</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof screenings !== 'undefined' && screenings.length) { %>
+            <% screenings.forEach(s => { %>
+              <tr>
+                <td><%= s.ScreeningID %></td>
+                <td><%= s.MovieTitle %></td>
+                <td><%= s.RoomName %></td>
+                <td><%= new Date(s.StartTime).toLocaleString('vi-VN') %></td>
+                <td><%= new Date(s.EndTime).toLocaleString('vi-VN') %></td>
+                <td><%= s.BasePrice.toLocaleString() %>đ</td>
+                <td class="actions">
+                  <button class="edit-btn">Sửa</button>
+                  <button class="delete-btn" onclick="if(confirm('Xóa suất chiếu?'))alert('Đã xóa')">Xóa</button>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Chưa có suất chiếu</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Screening Modal -->
+  <div id="addModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;padding:60px 20px;overflow-y:auto;">
+    <div style="max-width:500px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
+      <h2 style="color:var(--text-light);margin-bottom:20px;">Thêm suất chiếu</h2>
+      <form action="/admin/screenings" method="POST">
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Phim</label>
+          <select name="movieID" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+            <option value="">Chọn phim</option>
+            <% if (typeof movies !== 'undefined') { %>
+              <% movies.forEach(m => { %>
+                <option value="<%= m.MovieID %>"><%= m.Title %></option>
+              <% }); %>
+            <% } %>
+          </select>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Phòng chiếu</label>
+          <select name="roomID" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+            <option value="">Chọn phòng</option>
+            <option value="1">Phòng Lớn 01</option>
+            <option value="2">Phòng Lớn 02</option>
+            <option value="3">Phòng Nhỏ 03</option>
+            <option value="4">Phòng Nhỏ 04</option>
+            <option value="5">Phòng Nhỏ 05</option>
+          </select>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Giờ bắt đầu</label>
+          <input type="datetime-local" name="startTime" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Giá cơ bản</label>
+          <input type="number" name="basePrice" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('addModal').style.display='none'">Hủy</button>
+          <button type="submit" class="btn btn-primary">Thêm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <%- include('../../components/footer') %>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+.showtime-page {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.showtime-page h1 {
+  color: var(--text-light);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+.showtime-page .subtitle {
+  color: var(--text-muted);
+  margin-bottom: 30px;
+}
+.movie-selector {
+  margin-bottom: 30px;
+}
+.movie-selector select {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 15px;
+}
+.screening-card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid var(--border-color);
+  transition: border-color 0.3s;
+}
+.screening-card:hover { border-color: var(--primary); }
+.screening-card .movie-thumb {
+  width: 80px;
+  height: 110px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.screening-card .info { flex: 1; }
+.screening-card .info h3 { color: var(--text-light); font-size: 17px; margin-bottom: 4px; }
+.screening-card .info p { color: var(--text-muted); font-size: 13px; }
+.screening-card .time-price { text-align: right; flex-shrink: 0; }
+.screening-card .time-price .time { font-size: 18px; font-weight: 700; color: var(--accent); }
+.screening-card .time-price .price { font-size: 14px; color: var(--text-muted); }

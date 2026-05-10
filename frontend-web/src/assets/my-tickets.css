@@ -1,0 +1,57 @@
+.tickets-page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.tickets-page h1 {
+  color: var(--text-light);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+.tickets-page .subtitle {
+  color: var(--text-muted);
+  margin-bottom: 30px;
+}
+.ticket-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  gap: 20px;
+  transition: border-color 0.3s;
+}
+.ticket-card:hover { border-color: var(--primary); }
+.ticket-card .ticket-left {
+  flex: 0 0 100px;
+}
+.ticket-card .ticket-left img {
+  width: 100%;
+  border-radius: 8px;
+}
+.ticket-card .ticket-middle { flex: 1; }
+.ticket-card .ticket-middle h3 { color: var(--text-light); font-size: 18px; margin-bottom: 6px; }
+.ticket-card .ticket-middle .meta { color: var(--text-muted); font-size: 13px; margin-bottom: 4px; }
+.ticket-card .ticket-middle .meta span { color: var(--text-light); }
+.ticket-card .ticket-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.ticket-card .ticket-right .status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ticket-card .ticket-right .status.paid { background: rgba(76,175,80,0.2); color: #4caf50; }
+.ticket-card .ticket-right .status.pending { background: rgba(255,152,0,0.2); color: #ff9800; }
+.ticket-card .ticket-right .status.canceled { background: rgba(231,26,15,0.2); color: var(--primary); }
+.ticket-card .ticket-right .seats { color: var(--accent); font-size: 14px; margin-top: 6px; }
+
+@media (max-width: 600px) {
+  .ticket-card { flex-direction: column; }
+  .ticket-card .ticket-left { flex: 0 0 auto; max-width: 80px; }
+  .ticket-card .ticket-right { text-align: left; }
+}

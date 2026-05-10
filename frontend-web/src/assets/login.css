@@ -1,91 +1,102 @@
-* {
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.logo, .account {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.account #login {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
-    border: solid 1px #007BFF;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.account #register {
-    padding: 10px 20px;
-    background-color: #28A745;
-    color: white;
-    border: solid 1px #28A745;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.account #login:hover {
-    background-color: rgba(0, 123, 255, 0.8);
-}
-
-.account #register:hover {
-    background-color: rgba(40, 167, 69, 0.8);
-}
-
 main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-    padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 40px 20px;
 }
 
-/* Điều chỉnh container linh hoạt */
 .login-container {
-    background-color: #d3d3d3;
-    padding: 25px;
-    border: 1px solid #999;
-    width: 90%;         /* Chiếm 90% chiều rộng màn hình nhỏ */
-    max-width: 350px;    /* Không vượt quá 350px trên màn hình lớn */
+  background: var(--bg-card);
+  padding: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 380px;
 }
 
 .login-container h2 {
-    margin-top: 0;
-    font-size: 20px;
-    font-weight: normal;
-    margin-bottom: 25px;
+  color: var(--text-light);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
-.form-row {
-    margin-bottom: 20px;
+.login-container .form-row {
+  margin-bottom: 16px;
 }
 
-input {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    box-sizing: border-box;
-    font-size: 16px;
+.login-container input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-light);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.login-container input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.login-container .remember-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.login-container .remember-row input[type="checkbox"] {
+  width: auto;
 }
 
 .btn-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 
 .btn-container button {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    cursor: pointer;
-    font-size: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.3s;
 }
 
 .btn-container button:hover {
-    background-color: #cc0000;
+  background: var(--primary-dark);
+}
+
+.login-container .form-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.login-container .form-footer a {
+  color: var(--primary);
+}
+
+.alert {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.alert-error {
+  background: rgba(231,26,15,0.15);
+  color: var(--primary);
+  border: 1px solid rgba(231,26,15,0.3);
 }

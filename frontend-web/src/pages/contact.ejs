@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liên hệ - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/contact.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+  <%- include('../components/header', { currentPage: 'contact' }) %>
+
+  <main>
+    <div class="contact-page">
+      <h1>Liên hệ</h1>
+      <p class="subtitle">Gửi ý kiến hoặc thắc mắc cho chúng tôi</p>
+
+      <div class="contact-grid">
+        <div class="contact-form">
+          <form action="/contact" method="POST">
+            <div class="form-group">
+              <label>Họ tên</label>
+              <input type="text" name="senderName" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" name="senderEmail" required>
+            </div>
+            <div class="form-group">
+              <label>Tiêu đề</label>
+              <input type="text" name="subject" required>
+            </div>
+            <div class="form-group">
+              <label>Nội dung</label>
+              <textarea name="message" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Gửi liên hệ</button>
+          </form>
+        </div>
+
+        <div class="contact-info">
+          <div class="info-item">
+            <div class="info-icon">&#9906;</div>
+            <div class="info-text">
+              <h4>Địa chỉ</h4>
+              <p>Trung tâm Chiếu phim Quốc gia<br>87 Láng Hạ, Quận Đống Đa, Hà Nội</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">&#9742;</div>
+            <div class="info-text">
+              <h4>Điện thoại</h4>
+              <p>024 1234 5678</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">&#9993;</div>
+            <div class="info-text">
+              <h4>Email</h4>
+              <p>info@cinema.vn</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">&#9717;</div>
+            <div class="info-text">
+              <h4>Giờ làm việc</h4>
+              <p>Thứ Hai - Chủ Nhật: 08:00 - 23:00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/main.js"></script>
+</body>
+</html>

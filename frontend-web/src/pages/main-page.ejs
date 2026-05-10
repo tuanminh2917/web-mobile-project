@@ -1,66 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main page</title>
-    <link rel="stylesheet" href="../assets/main-page.css">
-    <link rel="stylesheet" href="../assets/responsive.css">
-    <link rel="stylesheet" href="../assets/common.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinema - Đặt vé xem phim</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/main-page.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
 </head>
 <body>
-    <%- include('components/header') %>
-    <main>
-        <!-- 1. Carousel nằm trên cùng -->
-        <div class="carousel-container">
-            <div class="carousel-wrapper">
-                <div class="carousel-item"><img src="poster1.jpg" alt="Phim 1"></div>
-                <div class="carousel-item"><img src="poster2.jpg" alt="Phim 2"></div>
-                <div class="carousel-item"><img src="poster3.jpg" alt="Phim 3"></div>
-            </div>
-            <button class="prev-btn">&#10094;</button>
-            <button class="next-btn">&#10095;</button>
-            <div class="dots-container">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-        </div>
+  <%- include('../components/header', { currentPage: 'home' }) %>
 
-        <!-- 2. Section Phim đang chiếu -->
-        <section class="now-showing">
-            <h2>Now Showing</h2>
-            <div class="movie-list grid-layout">
-                <div class="movie-item">
-                    <img src="movie1.jpg" alt="Movie 1">
-                    <h3>The Conjuring: Xác Ướp</h3>
-                    <p>Khởi chiếu: 17/04/2026</p>
-                </div>
-                <div class="movie-item">
-                    <img src="movie2.jpg" alt="Movie 2">
-                    <h3>Movie Title 2</h3>
-                    <p>Mô tả ngắn gọn về phim.</p>
-                </div>
-                <div class="movie-item">
-                    <img src="movie3.jpg" alt="Movie 3">
-                    <h3>Movie Title 3</h3>
-                    <p>Mô tả ngắn gọn về phim.</p>
-                </div>
-            </div>
-        </section>
+  <main>
+    <!-- Carousel -->
+    <div class="carousel-container">
+      <div class="carousel-wrapper">
+        <% if (typeof banners !== 'undefined' && banners.length) { %>
+          <% banners.forEach(banner => { %>
+            <div class="carousel-item"><img src="<%= banner.image %>" alt="<%= banner.title %>"></div>
+          <% }); %>
+        <% } else { %>
+          <div class="carousel-item"><img src="/assets/poster1.jpg" alt="Phim 1"></div>
+          <div class="carousel-item"><img src="/assets/poster2.jpg" alt="Phim 2"></div>
+          <div class="carousel-item"><img src="/assets/poster3.jpg" alt="Phim 3"></div>
+        <% } %>
+      </div>
+      <button class="prev-btn">&#10094;</button>
+      <button class="next-btn">&#10095;</button>
+      <div class="dots-container">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
 
-        <!-- 3. Section Phim sắp chiếu -->
-        <section class="coming-soon">
-            <h2>Coming Soon</h2>
-            <div class="movie-list grid-layout">
-                <div class="movie-item">
-                    <img src="movie4.jpg" alt="Movie 4">
-                    <h3>Movie Title 4</h3>
-                    <p>Dự kiến: Tháng 6/2026</p>
-                </div>
+    <!-- Now Showing -->
+    <section class="now-showing">
+      <h2 class="section-title">Phim đang chiếu</h2>
+      <div class="movie-list grid-layout">
+        <% if (typeof nowShowing !== 'undefined' && nowShowing.length) { %>
+          <% nowShowing.forEach(movie => { %>
+            <a href="/movies/<%= movie.MovieID %>" class="movie-item">
+              <img src="<%= movie.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= movie.Title %>">
+              <h3><%= movie.Title %></h3>
+              <p><%= movie.Genre %> &middot; <%= movie.Duration %> phút</p>
+              <p>Khởi chiếu: <%= new Date(movie.ReleaseDate).toLocaleDateString('vi-VN') %></p>
+            </a>
+          <% }); %>
+        <% } else { %>
+          <div class="movie-item">
+            <img src="/assets/movie1.jpg" alt="Movie 1">
+            <h3>The Conjuring: Xác Ướp</h3>
+            <p>Kinh dị &middot; 120 phút</p>
+            <p>Khởi chiếu: 17/04/2026</p>
+          </div>
+          <div class="movie-item">
+            <img src="/assets/movie2.jpg" alt="Movie 2">
+            <h3>Avengers: Endgame</h3>
+            <p>Hành động &middot; 181 phút</p>
+            <p>Khởi chiếu: 26/04/2019</p>
+          </div>
+          <div class="movie-item">
+            <img src="/assets/movie3.jpg" alt="Movie 3">
+            <h3>Lật Mặt 7</h3>
+            <p>Tâm lý &middot; 120 phút</p>
+            <p>Khởi chiếu: 26/04/2024</p>
+          </div>
+        <% } %>
+      </div>
+    </section>
+
+    <!-- Coming Soon -->
+    <section class="coming-soon">
+      <h2 class="section-title">Phim sắp chiếu</h2>
+      <div class="movie-list grid-layout">
+        <% if (typeof comingSoon !== 'undefined' && comingSoon.length) { %>
+          <% comingSoon.forEach(movie => { %>
+            <div class="movie-item">
+              <img src="<%= movie.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= movie.Title %>">
+              <h3><%= movie.Title %></h3>
+              <p><%= movie.Genre %> &middot; <%= movie.Duration %> phút</p>
+              <p>Dự kiến: <%= new Date(movie.ReleaseDate).toLocaleDateString('vi-VN') %></p>
             </div>
-        </section>
-    </main>
-    <%- include('components/footer') %>
+          <% }); %>
+        <% } else { %>
+          <div class="movie-item">
+            <img src="/assets/movie4.jpg" alt="Movie 4">
+            <h3>Movie Title 4</h3>
+            <p>Dự kiến: Tháng 6/2026</p>
+          </div>
+        <% } %>
+      </div>
+    </section>
+  </main>
+
+  <%- include('../components/footer') %>
+
+  <script src="../js/carousel.js"></script>
+  <script src="../js/main.js"></script>
 </body>
 </html>

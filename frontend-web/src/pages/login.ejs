@@ -1,31 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="../assets/login.css">
-    <link rel="stylesheet" href="../assets/responsive.css">
-    <link rel="stylesheet" href="../assets/common.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/login.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
 </head>
 <body>
-    <%- include('components/header') %>
-    <main>
-        <div class="login-container">
-            <h2>Login</h2>
-            <form>
-                <div class="form-row">
-                    <input type="text" placeholder="Username">
-                </div>
-                <div class="form-row">
-                    <input type="password" placeholder="Password">
-                </div>
-                <div class="btn-container">
-                    <button type="submit">Login</button>
-                </div>
-            </form>
+  <%- include('../components/header', { currentPage: 'login' }) %>
+
+  <main>
+    <div class="login-container">
+      <h2>Đăng nhập</h2>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+      <form action="/login" method="POST">
+        <div class="form-row">
+          <input type="text" name="username" placeholder="Tên đăng nhập" required>
         </div>
-    </main>
-    <%- include('components/footer') %>
+        <div class="form-row">
+          <input type="password" name="password" placeholder="Mật khẩu" required>
+        </div>
+        <div class="form-row remember-row">
+          <label><input type="checkbox" name="remember"> Ghi nhớ đăng nhập</label>
+        </div>
+        <div class="btn-container">
+          <button type="submit">Đăng nhập</button>
+        </div>
+      </form>
+      <p class="form-footer">Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
+    </div>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/main.js"></script>
 </body>
 </html>

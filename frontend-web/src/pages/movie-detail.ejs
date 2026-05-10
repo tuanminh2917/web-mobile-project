@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= movie.Title %> - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/movie-detail.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+  <%- include('../components/header', { currentPage: 'movies' }) %>
+
+  <main>
+    <div class="movie-detail">
+      <div class="movie-poster">
+        <img src="<%= movie.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= movie.Title %>">
+      </div>
+      <div class="movie-info">
+        <h1><%= movie.Title %></h1>
+        <div class="movie-meta">
+          <span class="tag censorship"><%= movie.Censorship %></span>
+          <span class="tag"><%= movie.Genre %></span>
+          <span class="tag"><%= movie.Duration %> phút</span>
+          <span class="tag"><%= movie.Languages %></span>
+          <% if (typeof avgRating !== 'undefined') { %>
+            <span class="tag rating">&#9733; <%= avgRating %>/5</span>
+          <% } %>
+        </div>
+
+        <div class="movie-extra">
+          <p><strong>Đạo diễn:</strong> <span><%= movie.Director || 'Đang cập nhật' %></span></p>
+          <p><strong>Diễn viên:</strong> <span><%= movie.Actor || 'Đang cập nhật' %></span></p>
+          <p><strong>Khởi chiếu:</strong> <span><%= new Date(movie.ReleaseDate).toLocaleDateString('vi-VN') %></span></p>
+        </div>
+
+        <div class="movie-desc">
+          <p><%= movie.Description || 'Chưa có mô tả.' %></p>
+        </div>
+
+        <div class="showtime-section">
+          <h3>Chọn suất chiếu</h3>
+          <div class="date-tabs">
+            <% if (typeof dates !== 'undefined') { %>
+              <% dates.forEach((date, i) => { %>
+                <div class="date-tab <%= i === 0 ? 'active' : '' %>" data-date="<%= date %>">
+                  <span class="day"><%= new Date(date).toLocaleDateString('vi-VN', { weekday: 'short' }) %></span>
+                  <span class="date-num"><%= new Date(date).getDate() %></span>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="date-tab active"><span class="day">Hôm nay</span><span class="date-num">10</span></div>
+              <div class="date-tab"><span class="day">Mai</span><span class="date-num">11</span></div>
+              <div class="date-tab"><span class="day">T2</span><span class="date-num">12</span></div>
+            <% } %>
+          </div>
+
+          <% if (typeof screenings !== 'undefined' && screenings.length) { %>
+            <% Object.keys(screenings).forEach(room => { %>
+              <div class="room-showtimes">
+                <h4><%= room %></h4>
+                <div class="showtime-grid">
+                  <% screenings[room].forEach(s => { %>
+                    <a href="/book/<%= s.ScreeningID %>" class="showtime-btn">
+                      <span class="time"><%= new Date(s.StartTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %></span>
+                      <span class="price"><%= s.BasePrice.toLocaleString() %>đ</span>
+                    </a>
+                  <% }); %>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="room-showtimes">
+              <h4>Phòng 1 (Phòng lớn)</h4>
+              <div class="showtime-grid">
+                <a href="/book/1" class="showtime-btn">
+                  <span class="time">09:00</span>
+                  <span class="price">50,000đ</span>
+                </a>
+                <a href="/book/2" class="showtime-btn">
+                  <span class="time">14:30</span>
+                  <span class="price">60,000đ</span>
+                </a>
+                <a href="/book/3" class="showtime-btn">
+                  <span class="time">19:00</span>
+                  <span class="price">80,000đ</span>
+                </a>
+                <a href="/book/4" class="showtime-btn">
+                  <span class="time">22:00</span>
+                  <span class="price">100,000đ</span>
+                </a>
+              </div>
+            </div>
+            <div class="room-showtimes">
+              <h4>Phòng 3 (Phòng nhỏ)</h4>
+              <div class="showtime-grid">
+                <a href="/book/5" class="showtime-btn">
+                  <span class="time">10:30</span>
+                  <span class="price">50,000đ</span>
+                </a>
+                <a href="/book/6" class="showtime-btn">
+                  <span class="time">15:00</span>
+                  <span class="price">60,000đ</span>
+                </a>
+                <a href="/book/7" class="showtime-btn">
+                  <span class="time">19:30</span>
+                  <span class="price">90,000đ</span>
+                </a>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <section style="max-width:1000px;margin:40px auto;padding:0 20px;width:100%;">
+      <h2 class="section-title">Đánh giá & Bình luận</h2>
+      <% if (typeof user !== 'undefined' && user) { %>
+        <form action="/movies/<%= movie.MovieID %>/comment" method="POST" style="background:var(--bg-card);padding:20px;border-radius:10px;border:1px solid var(--border-color);margin-bottom:24px;">
+          <div style="margin-bottom:12px;">
+            <label style="color:var(--text-muted);font-size:14px;display:block;margin-bottom:6px;">Đánh giá của bạn</label>
+            <div class="star-rating">
+              <% for (let i = 5; i >= 1; i--) { %>
+                <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>">
+                <label for="star<%= i %>">&#9733;</label>
+              <% } %>
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <textarea name="content" placeholder="Viết bình luận..." style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);min-height:80px;font-family:var(--font-main);"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+        </form>
+      <% } else { %>
+        <p style="color:var(--text-muted);margin-bottom:24px;"><a href="/login">Đăng nhập</a> để viết đánh giá.</p>
+      <% } %>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <% if (typeof comments !== 'undefined' && comments.length) { %>
+          <% comments.forEach(c => { %>
+            <div style="background:var(--bg-card);padding:16px;border-radius:8px;border:1px solid var(--border-color);">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                <strong style="color:var(--text-light);font-size:14px;"><%= c.FullName || c.Username %></strong>
+                <span style="color:var(--accent);font-size:13px;"><%= '★'.repeat(c.Rating) %><%= '☆'.repeat(5 - c.Rating) %></span>
+              </div>
+              <p style="color:var(--text-body);font-size:14px;"><%= c.Content %></p>
+              <p style="color:var(--text-muted);font-size:12px;margin-top:8px;"><%= new Date(c.CreatedAt).toLocaleDateString('vi-VN') %></p>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <p style="color:var(--text-muted);font-size:14px;">Chưa có bình luận nào.</p>
+        <% } %>
+      </div>
+    </section>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/main.js"></script>
+</body>
+</html>

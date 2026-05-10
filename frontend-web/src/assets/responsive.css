@@ -1,22 +1,57 @@
-/* responsive.css */
-
-/* Thiết lập các biến CSS để dễ quản lý con số */
 :root {
-  --bp-tablet: 800px;  /* Ngưỡng Tablet theo yêu cầu */
-  --bp-desktop: 1200px; /* Ngưỡng Desktop theo yêu cầu */
+  --bp-tablet: 800px;
+  --bp-desktop: 1200px;
 }
 
-/* Các class ẩn/hiện nhanh */
 .mobile-only { display: block; }
 .tablet-up { display: none; }
 
 @media screen and (min-width: 800px) {
   .mobile-only { display: none; }
   .tablet-up { display: block; }
-  .grid-layout { display: grid; grid-template-columns: 1fr 1fr; } /* Chia đôi cho tablet[cite: 1] */
+  .grid-layout { display: grid; grid-template-columns: 1fr 1fr; }
 }
 
 @media screen and (min-width: 1200px) {
   .desktop-up { display: block; }
-  .grid-layout { grid-template-columns: repeat(4, 1fr); } /* Chia 4 cho desktop[cite: 1] */
+  .grid-layout { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 799px) {
+  .nav-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--secondary);
+    flex-direction: column;
+    padding: 16px;
+    border-top: 1px solid var(--border-color);
+    z-index: 100;
+  }
+  .nav-menu.open { display: flex; }
+  .nav-toggle {
+    display: flex !important;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+  }
+  .nav-toggle span {
+    width: 24px;
+    height: 2px;
+    background: var(--text-light);
+    transition: all 0.3s;
+  }
+  .nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .nav-toggle.open span:nth-child(2) { opacity: 0; }
+  .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+}
+
+@media (min-width: 800px) {
+  .nav-toggle { display: none !important; }
+  .nav-menu { display: flex !important; flex-direction: row; align-items: center; gap: 24px; position: static; background: none; padding: 0; border: none; }
 }

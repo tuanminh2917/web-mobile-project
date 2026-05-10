@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vé của tôi - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/my-tickets.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+  <%- include('../components/header', { currentPage: 'my-tickets' }) %>
+
+  <main>
+    <div class="tickets-page">
+      <h1>Vé của tôi</h1>
+      <p class="subtitle">Lịch sử đặt vé xem phim của bạn</p>
+
+      <% if (typeof bookings !== 'undefined' && bookings.length) { %>
+        <% bookings.forEach(b => { %>
+          <div class="ticket-card">
+            <div class="ticket-left">
+              <img src="<%= b.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= b.MovieTitle %>">
+            </div>
+            <div class="ticket-middle">
+              <h3><%= b.MovieTitle %></h3>
+              <p class="meta"><span><%= b.RoomName %></span></p>
+              <p class="meta"><span><%= new Date(b.StartTime).toLocaleString('vi-VN') %></span></p>
+              <p class="meta">Ghế: <span><%= b.Seats %></span></p>
+              <p class="meta">Mã giao dịch: <span>#BK<%= b.BookingID %></span></p>
+            </div>
+            <div class="ticket-right">
+              <span class="status <%= b.Status.toLowerCase() %>"><%= b.Status === 'Paid' ? 'Đã thanh toán' : b.Status === 'Pending' ? 'Chờ thanh toán' : 'Đã hủy' %></span>
+              <div class="seats"><%= b.TotalPrice.toLocaleString() %>đ</div>
+              <% if (b.Status === 'Paid') { %>
+                <button class="btn btn-sm btn-secondary" style="margin-top:8px;" onclick="alert('Vé điện tử: #BK<%= b.BookingID %>')">Xem vé</button>
+              <% } %>
+              <% if (b.Status === 'Pending') { %>
+                <a href="/checkout/<%= b.BookingID %>" class="btn btn-sm btn-primary" style="margin-top:8px;display:inline-block;">Thanh toán</a>
+              <% } %>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div style="text-align:center;padding:60px 20px;background:var(--bg-card);border-radius:10px;border:1px solid var(--border-color);">
+          <p style="color:var(--text-muted);font-size:18px;margin-bottom:16px;">Bạn chưa có vé nào</p>
+          <a href="/movies" class="btn btn-primary">Xem phim ngay</a>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/main.js"></script>
+</body>
+</html>

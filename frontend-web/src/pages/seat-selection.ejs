@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chọn ghế - Cinema</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/seat-selection.css">
+  <link rel="stylesheet" href="../assets/responsive.css">
+  <link rel="stylesheet" href="../assets/common.css">
+</head>
+<body>
+  <%- include('../components/header', { currentPage: 'booking' }) %>
+
+  <main>
+    <div class="seat-page">
+      <h1>Chọn ghế ngồi</h1>
+      <p class="subtitle"><%= movie.Title %> &middot; <%= roomName %> &middot; <%= new Date(startTime).toLocaleString('vi-VN') %></p>
+
+      <div id="seatMapContainer"></div>
+
+      <form action="/book/<%= screeningID %>/confirm" method="POST" id="bookingForm">
+        <input type="hidden" name="seats" id="selectedSeatsInput">
+        <input type="hidden" name="total" id="totalInput">
+        <button type="submit" class="btn btn-primary btn-lg payment-btn" style="width:100%;" id="confirmBtn" disabled>
+          Tiến hành thanh toán
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <%- include('../components/footer') %>
+  <script src="../js/seat-map.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const occupiedSeats = <%= JSON.stringify(occupiedSeats || []) %>;
+      const seatTypes = <%= JSON.stringify(seatTypes || {}) %>;
+      const seatsPerRow = <%= seatsPerRow || 12 %>;
+      const rows = <%= rows || 10 %>;
+      const regularPrice = <%= regularPrice || 50000 %>;
+      const vipPrice = <%= vipPrice || 65000 %>;
+      const couplePrice = <%= couplePrice || 130000 %>;
+
+      const seatMap = new SeatMap('#seatMapContainer', {
+        rows: rows,
+        seatsPerRow: seatsPerRow,
+        maxSelectable: 8,
+        occupiedSeats: occupiedSeats,
+        seatTypes: seatTypes,
+        regularPrice: regularPrice,
+        vipPrice: vipPrice,
+        couplePrice: couplePrice
+      });
+
+      const confirmBtn = document.getElementById('confirmBtn');
+      const seatsInput = document.getElementById('selectedSeatsInput');
+      const totalInput = document.getElementById('totalInput');
+      const form = document.getElementById('bookingForm');
+
+      // Enable/disable confirm button based on selection
+      const observer = setInterval(() => {
+        if (seatMap.getSelectedSeats().length > 0) {
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = `Thanh toán - ${seatMap.getTotal().toLocaleString()}đ`;
+        } else {
+          confirmBtn.disabled = true;
+          confirmBtn.textContent = 'Tiến hành thanh toán';
+        }
+      }, 200);
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        seatsInput.value = JSON.stringify(seatMap.getSelectedSeats());
+        totalInput.value = seatMap.getTotal();
+        this.submit();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,29 +1,77 @@
 header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 40px;
+  background: var(--secondary);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+header .logo img { height: 36px; }
+header .logo h1 {
+  color: var(--text-light);
+  font-size: 20px;
+  font-weight: 700;
+}
+header .logo h1 span { color: var(--primary); }
+
+header .nav-menu a {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s;
+  padding: 6px 0;
+}
+header .nav-menu a:hover,
+header .nav-menu a.active {
+  color: var(--text-light);
+}
+
+header .account { display: flex; align-items: center; gap: 10px; }
+header .account .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+header .account .user-name {
+  color: var(--text-light);
+  font-size: 14px;
 }
 
 footer {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    padding: 20px;
-    background-color: darkblue;
-    color: white;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 30px 20px;
+  background: var(--secondary);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
 }
-
 footer .footer-items {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap; /* Cho phép các mục nhảy dòng nếu màn hình quá hẹp */
-    margin-bottom: 10px;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  gap: 20px;
+  list-style: none;
 }
-
-footer .footer-items li { list-style: none; }
-footer .footer-items li a { color: white; text-decoration: none; }
-footer .footer-items li a:hover { text-decoration: underline; }
+footer .footer-items li a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+footer .footer-items li a:hover { color: var(--text-light); }
+footer p { font-size: 12px; }

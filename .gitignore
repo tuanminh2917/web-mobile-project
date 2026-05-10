@@ -1,3 +1,7 @@
 node_modules/
 miscellanea/
 docs/
+server.js
+package-lock.json
+package.json
+
