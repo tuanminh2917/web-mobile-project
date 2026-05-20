@@ -17,6 +17,13 @@
       <h1>Chọn ghế ngồi</h1>
       <p class="subtitle"><%= movie.Title %> &middot; <%= roomName %> &middot; <%= new Date(startTime).toLocaleString('vi-VN') %></p>
 
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error" id="errorMsg">
+          <span><%= error %></span>
+          <button type="button" onclick="document.getElementById('errorMsg').style.display='none'" class="btn-close">Đóng</button>
+        </div>
+      <% } %>
+
       <div id="seatMapContainer"></div>
 
       <form action="/book/<%= screeningID %>/confirm" method="POST" id="bookingForm">

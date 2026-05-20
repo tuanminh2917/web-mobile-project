@@ -1,8 +1,8 @@
 <header>
-  <div class="logo">
+  <a href="/" class="logo" style="text-decoration: none; color: inherit;">
     <img src="/assets/logo.png" alt="Cinema">
     <h1><span>C</span>inema</h1>
-  </div>
+  </a>
 
   <button class="nav-toggle" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -18,12 +18,17 @@
 
   <div class="account">
     <% if (typeof user !== 'undefined' && user) { %>
-      <span class="user-name"><%= user.FullName || user.Username %></span>
       <a href="/my-tickets" class="btn btn-sm btn-secondary">Vé của tôi</a>
       <% if (user.Role === 'Admin') { %>
         <a href="/admin/dashboard" class="btn btn-sm btn-accent">Admin</a>
       <% } %>
-      <a href="/logout" class="btn btn-sm btn-primary">Đăng xuất</a>
+      <div class="avatar-dropdown">
+        <img src="/assets/avatar.png" alt="Avatar" class="avatar" id="avatarBtn">
+        <div class="dropdown-menu" id="dropdownMenu">
+          <span class="dropdown-user"><%= user.FullName || user.Username %></span>
+          <a href="/logout" class="dropdown-item">Đăng xuất</a>
+        </div>
+      </div>
     <% } else { %>
       <a href="/login" class="btn btn-sm btn-primary">Đăng nhập</a>
       <a href="/register" class="btn btn-sm btn-secondary">Đăng ký</a>

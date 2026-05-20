@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý quảng cáo - Admin</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="../../assets/responsive.css">
+  <link rel="stylesheet" href="../../assets/common.css">
+</head>
+<body>
+  <%- include('../../components/header', { currentPage: 'admin' }) %>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand"><h2><span>A</span>dmin</h2></div>
+      <a href="/admin/dashboard" class="nav-item"><span class="icon">&#9632;</span> <span>Dashboard</span></a>
+      <a href="/admin/movies" class="nav-item"><span class="icon">&#127910;</span> <span>Quản lý phim</span></a>
+      <a href="/admin/screenings" class="nav-item"><span class="icon">&#128197;</span> <span>Quản lý suất chiếu</span></a>
+      <a href="/admin/bookings" class="nav-item"><span class="icon">&#128203;</span> <span>Quản lý đặt vé</span></a>
+      <a href="/admin/users" class="nav-item"><span class="icon">&#128101;</span> <span>Quản lý người dùng</span></a>
+      <a href="/admin/comments" class="nav-item"><span class="icon">💬</span> <span>Quản lý bình luận</span></a>
+      <a href="/admin/advertisements" class="nav-item active"><span class="icon">📢</span> <span>Quản lý quảng cáo</span></a>
+      <a href="/admin/contact" class="nav-item"><span class="icon">✉️</span> <span>Tin nhắn liên hệ</span></a>
+      <a href="/" class="nav-item"><span class="icon">&#8592;</span> <span>Về trang chủ</span></a>
+    </aside>
+
+    <div class="admin-content">
+      <div class="admin-toolbar">
+        <h1>Quản lý quảng cáo</h1>
+        <button class="btn btn-primary" onclick="document.getElementById('addModal').style.display='block'">+ Thêm quảng cáo</button>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Hình ảnh</th>
+            <th>Tên sản phẩm</th>
+            <th>Đường dẫn</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof ads !== 'undefined' && ads.length) { %>
+            <% ads.forEach(ad => { %>
+              <tr>
+                <td><%= ad.AdID %></td>
+                <td><img src="<%= ad.ImageURL || '/assets/poster-placeholder.jpg' %>" style="width:60px;height:40px;object-fit:cover;border-radius:4px;"></td>
+                <td><%= ad.ProductTitle %></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= ad.TargetLink %></td>
+                <td>
+                  <span class="badge <%= ad.IsActive ? 'active' : 'inactive' %>">
+                    <%= ad.IsActive ? 'Bật' : 'Tắt' %>
+                  </span>
+                </td>
+                <td class="actions">
+                  <button class="edit-btn" onclick="editAd(<%= ad.AdID %>, '<%= ad.ProductTitle %>', '<%= ad.ImageURL %>', '<%= ad.TargetLink %>', <%= ad.IsActive %>)">Sửa</button>
+                  <form action="/admin/advertisements/<%= ad.AdID %>/toggle" method="POST" style="display:inline;">
+                    <button type="submit" class="edit-btn"><%= ad.IsActive ? 'Tắt' : 'Bật' %></button>
+                  </form>
+                  <form action="/admin/advertisements/<%= ad.AdID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Xóa quảng cáo này?')">
+                    <button type="submit" class="delete-btn">Xóa</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Chưa có quảng cáo nào</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Advertisement Modal -->
+  <div id="addModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;padding:60px 20px;overflow-y:auto;">
+    <div style="max-width:500px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
+      <h2 style="color:var(--text-light);margin-bottom:20px;">Thêm quảng cáo mới</h2>
+      <form action="/admin/advertisements" method="POST" style="display:grid;gap:16px;">
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Tên sản phẩm</label>
+          <input type="text" name="productTitle" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">URL hình ảnh</label>
+          <input type="url" name="imageURL" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Đường dẫn đích</label>
+          <input type="url" name="targetLink" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="isActive" name="isActive" checked>
+          <label for="isActive" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Bật ngay</label>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('addModal').style.display='none'">Hủy</button>
+          <button type="submit" class="btn btn-primary">Thêm quảng cáo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Advertisement Modal -->
+  <div id="editModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;padding:60px 20px;overflow-y:auto;">
+    <div style="max-width:500px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
+      <h2 style="color:var(--text-light);margin-bottom:20px;">Sửa quảng cáo</h2>
+      <form id="editForm" method="POST" style="display:grid;gap:16px;">
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Tên sản phẩm</label>
+          <input type="text" id="editProductTitle" name="productTitle" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">URL hình ảnh</label>
+          <input type="url" id="editImageURL" name="imageURL" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Đường dẫn đích</label>
+          <input type="url" id="editTargetLink" name="targetLink" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="editIsActive" name="isActive">
+          <label for="editIsActive" style="color:var(--text-muted);font-size:13px;cursor:pointer;">Bật</label>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('editModal').style.display='none'">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <%- include('../../components/footer') %>
+  <script src="../../js/main.js"></script>
+  <script>
+    function editAd(id, title, imageURL, targetLink, isActive) {
+      document.getElementById('editProductTitle').value = title;
+      document.getElementById('editImageURL').value = imageURL;
+      document.getElementById('editTargetLink').value = targetLink;
+      document.getElementById('editIsActive').checked = isActive;
+      document.getElementById('editForm').action = `/admin/advertisements/${id}/update`;
+      document.getElementById('editModal').style.display = 'block';
+    }
+    
+    document.getElementById('editModal')?.addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+    document.getElementById('addModal')?.addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

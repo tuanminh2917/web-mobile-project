@@ -82,14 +82,40 @@ main {
 }
 
 .alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 10px 14px;
   border-radius: 6px;
   font-size: 13px;
   margin-bottom: 16px;
+}
+.btn-close {
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+.btn-close:hover {
+  background: var(--primary);
+  color: white;
 }
 
 .alert-error {
   background: rgba(231,26,15,0.15);
   color: var(--primary);
   border: 1px solid rgba(231,26,15,0.3);
+}
+
+.success-message {
+  text-align: center;
+  padding: 30px 20px;
+}
+.success-message p {
+  color: #4caf50;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }

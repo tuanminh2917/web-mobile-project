@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý đặt vé - Admin</title>
+  <title>Quản lý bình luận - Admin</title>
   <link rel="stylesheet" href="../../assets/style.css">
   <link rel="stylesheet" href="../../assets/admin.css">
   <link rel="stylesheet" href="../../assets/responsive.css">
@@ -18,9 +18,9 @@
       <a href="/admin/dashboard" class="nav-item"><span class="icon">&#9632;</span> <span>Dashboard</span></a>
       <a href="/admin/movies" class="nav-item"><span class="icon">&#127910;</span> <span>Quản lý phim</span></a>
       <a href="/admin/screenings" class="nav-item"><span class="icon">&#128197;</span> <span>Quản lý suất chiếu</span></a>
-      <a href="/admin/bookings" class="nav-item active"><span class="icon">&#128203;</span> <span>Quản lý đặt vé</span></a>
+      <a href="/admin/bookings" class="nav-item"><span class="icon">&#128203;</span> <span>Quản lý đặt vé</span></a>
       <a href="/admin/users" class="nav-item"><span class="icon">&#128101;</span> <span>Quản lý người dùng</span></a>
-      <a href="/admin/comments" class="nav-item"><span class="icon">💬</span> <span>Quản lý bình luận</span></a>
+      <a href="/admin/comments" class="nav-item active"><span class="icon">💬</span> <span>Quản lý bình luận</span></a>
       <a href="/admin/advertisements" class="nav-item"><span class="icon">📢</span> <span>Quản lý quảng cáo</span></a>
       <a href="/admin/contact" class="nav-item"><span class="icon">✉️</span> <span>Tin nhắn liên hệ</span></a>
       <a href="/" class="nav-item"><span class="icon">&#8592;</span> <span>Về trang chủ</span></a>
@@ -28,50 +28,52 @@
 
     <div class="admin-content">
       <div class="admin-toolbar">
-        <h1>Quản lý đặt vé</h1>
+        <h1>Quản lý bình luận</h1>
         <div class="search-box">
-          <input type="text" placeholder="Tìm mã đơn, khách hàng..." id="searchInput">
+          <input type="text" placeholder="Tìm phim, tác giả..." id="searchInput">
         </div>
       </div>
 
       <table class="admin-table">
         <thead>
           <tr>
-            <th>Mã đơn</th>
-            <th>Khách hàng</th>
+            <th>ID</th>
             <th>Phim</th>
-            <th>Suất chiếu</th>
-            <th>Ghế</th>
-            <th>Tổng tiền</th>
+            <th>Tác giả</th>
+            <th>Nội dung</th>
+            <th>Rating</th>
+            <th>Ngày</th>
             <th>Trạng thái</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          <% if (typeof bookings !== 'undefined' && bookings.length) { %>
-            <% bookings.forEach(b => { %>
+          <% if (typeof comments !== 'undefined' && comments.length) { %>
+            <% comments.forEach(c => { %>
               <tr>
-                <td>#BK<%= b.BookingID %></td>
-                <td><%= b.FullName || b.Username %></td>
-                <td><%= b.MovieTitle %></td>
-                <td><%= new Date(b.StartTime).toLocaleString('vi-VN') %></td>
-                <td><%= b.Seats %></td>
-                <td><%= b.TotalPrice.toLocaleString() %>đ</td>
+                <td><%= c.MovieID %>-<%= c.UserID %></td>
+                <td><%= c.MovieTitle %></td>
+                <td><%= c.FullName || c.Username %></td>
+                <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= c.Content %></td>
+                <td><span style="color:var(--accent);">★ <%= c.Rating %>/5</span></td>
+                <td><%= new Date(c.CreatedAt).toLocaleDateString('vi-VN') %></td>
                 <td>
-                  <span class="badge <%= b.Status === 'Paid' ? 'active' : b.Status === 'Pending' ? 'soon' : 'inactive' %>">
-                    <%= b.Status === 'Paid' ? 'Đã thanh toán' : b.Status === 'Pending' ? 'Chờ' : 'Đã hủy' %>
+                  <span class="badge <%= c.IsVisible ? 'active' : 'inactive' %>">
+                    <%= c.IsVisible ? 'Hiển thị' : 'Ẩn' %>
                   </span>
                 </td>
                 <td class="actions">
-                  <button class="view-btn">Chi tiết</button>
-                  <% if (b.Status === 'Pending') { %>
-                    <button class="edit-btn">Xác nhận</button>
-                  <% } %>
+                  <form action="/admin/comments/<%= c.MovieID %>/<%= c.UserID %>/toggle" method="POST" style="display:inline;">
+                    <button type="submit" class="edit-btn"><%= c.IsVisible ? 'Ẩn' : 'Hiển thị' %></button>
+                  </form>
+                  <form action="/admin/comments/<%= c.MovieID %>/<%= c.UserID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Xóa bình luận này?')">
+                    <button type="submit" class="delete-btn">Xóa</button>
+                  </form>
                 </td>
               </tr>
             <% }); %>
           <% } else { %>
-            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Chưa có giao dịch</td></tr>
+            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Chưa có bình luận nào</td></tr>
           <% } %>
         </tbody>
       </table>

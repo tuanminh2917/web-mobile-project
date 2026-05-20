@@ -25,8 +25,8 @@ class SeatMap {
     this.bindEvents();
   }
 
-  getSeatType(rowIdx, seatIdx, roomSize) {
-    const cacheKey = `${rowIdx}-${seatIdx}`;
+  getSeatType(rowIdx, seatIdx, rowLabel, seatNum) {
+    const cacheKey = `${rowLabel}-${seatNum}`;
     if (this.seatTypes[cacheKey]) return this.seatTypes[cacheKey];
 
     const maxRows = this.options.rows;
@@ -66,7 +66,7 @@ class SeatMap {
       for (let s = 0; s < seatsInRow; s++) {
         const seatNum = s + 1;
         const rowLabel = this.rowLabels[r];
-        const type = this.getSeatType(r, s);
+        const type = this.getSeatType(r, s, rowLabel, seatNum);
         const occupied = this.isOccupied(rowLabel, seatNum);
 
         const seat = document.createElement('div');

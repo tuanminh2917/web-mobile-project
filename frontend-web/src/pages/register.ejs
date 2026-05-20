@@ -14,33 +14,43 @@
 
   <main>
     <div class="register-container">
-      <h2>Đăng ký tài khoản</h2>
-      <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-error"><%= error %></div>
+      <% if (typeof success !== 'undefined' && success) { %>
+        <div class="success-message">
+          <p><%= success %></p>
+          <button onclick="window.location.href='/'" class="btn btn-primary">Đóng</button>
+        </div>
+      <% } else { %>
+        <h2>Đăng ký tài khoản</h2>
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="alert alert-error" id="errorMsg">
+            <span><%= error %></span>
+            <button type="button" onclick="document.getElementById('errorMsg').style.display='none'" class="btn-close">Đóng</button>
+          </div>
+        <% } %>
+        <form action="/register" method="POST">
+          <div class="form-row">
+            <input type="text" name="fullname" placeholder="Họ và tên" class="flex-2" value="<%= typeof formData !== 'undefined' && formData.fullname ? formData.fullname : '' %>" required>
+            <input type="date" name="dob" class="flex-1" value="<%= typeof formData !== 'undefined' && formData.dob ? formData.dob : '' %>" required>
+          </div>
+          <div class="form-row">
+            <input type="email" name="email" placeholder="Email" class="flex-1" value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>" required>
+            <input type="text" name="phone" placeholder="Số điện thoại (vd: 0912345678)" class="flex-1" value="<%= typeof formData !== 'undefined' && formData.phone ? formData.phone : '' %>" required>
+          </div>
+          <div class="form-row">
+            <input type="text" name="username" placeholder="Tên đăng nhập" value="<%= typeof formData !== 'undefined' && formData.username ? formData.username : '' %>" required>
+          </div>
+          <div class="form-row">
+            <input type="password" name="password" placeholder="Mật khẩu (8+ ký tự, hoa, thường, số, ký tự đặc biệt)" required>
+          </div>
+          <div class="form-row">
+            <input type="password" name="confirm_password" placeholder="Xác nhận mật khẩu" required>
+          </div>
+          <div class="btn-container">
+            <button type="submit">Đăng ký</button>
+          </div>
+        </form>
+        <p class="form-footer">Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
       <% } %>
-      <form action="/register" method="POST">
-        <div class="form-row">
-          <input type="text" name="fullname" placeholder="Họ và tên" class="flex-2" required>
-          <input type="date" name="dob" placeholder="Ngày sinh" class="flex-1">
-        </div>
-        <div class="form-row">
-          <input type="email" name="email" placeholder="Email" class="flex-1" required>
-          <input type="text" name="phone" placeholder="Số điện thoại" class="flex-1">
-        </div>
-        <div class="form-row">
-          <input type="text" name="username" placeholder="Tên đăng nhập" required>
-        </div>
-        <div class="form-row">
-          <input type="password" name="password" placeholder="Mật khẩu" required>
-        </div>
-        <div class="form-row">
-          <input type="password" name="confirm_password" placeholder="Xác nhận mật khẩu" required>
-        </div>
-        <div class="btn-container">
-          <button type="submit">Đăng ký</button>
-        </div>
-      </form>
-      <p class="form-footer">Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
     </div>
   </main>
 

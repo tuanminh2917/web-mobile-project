@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tin nhắn liên hệ - Admin</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="../../assets/responsive.css">
+  <link rel="stylesheet" href="../../assets/common.css">
+  <style>
+    .message-detail {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .message-detail.show { display: flex; }
+    .message-detail .modal-content {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 30px;
+      border: 1px solid var(--border-color);
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .message-detail .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .message-detail h2 { color: var(--text-light); font-size: 20px; margin: 0; }
+    .message-detail .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .message-detail .msg-field {
+      margin-bottom: 16px;
+    }
+    .message-detail .msg-label {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .message-detail .msg-value {
+      color: var(--text-light);
+      font-size: 14px;
+      word-break: break-word;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../../components/header', { currentPage: 'admin' }) %>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand"><h2><span>A</span>dmin</h2></div>
+      <a href="/admin/dashboard" class="nav-item"><span class="icon">&#9632;</span> <span>Dashboard</span></a>
+      <a href="/admin/movies" class="nav-item"><span class="icon">&#127910;</span> <span>Quản lý phim</span></a>
+      <a href="/admin/screenings" class="nav-item"><span class="icon">&#128197;</span> <span>Quản lý suất chiếu</span></a>
+      <a href="/admin/bookings" class="nav-item"><span class="icon">&#128203;</span> <span>Quản lý đặt vé</span></a>
+      <a href="/admin/users" class="nav-item"><span class="icon">&#128101;</span> <span>Quản lý người dùng</span></a>
+      <a href="/admin/comments" class="nav-item"><span class="icon">💬</span> <span>Quản lý bình luận</span></a>
+      <a href="/admin/advertisements" class="nav-item"><span class="icon">📢</span> <span>Quản lý quảng cáo</span></a>
+      <a href="/admin/contact" class="nav-item active"><span class="icon">✉️</span> <span>Tin nhắn liên hệ</span></a>
+      <a href="/" class="nav-item"><span class="icon">&#8592;</span> <span>Về trang chủ</span></a>
+    </aside>
+
+    <div class="admin-content">
+      <div class="admin-toolbar">
+        <h1>Tin nhắn liên hệ</h1>
+        <div class="search-box">
+          <input type="text" placeholder="Tìm email, chủ đề..." id="searchInput">
+        </div>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Chủ đề</th>
+            <th>Ngày gửi</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof messages !== 'undefined' && messages.length) { %>
+            <% messages.forEach(m => { %>
+              <tr>
+                <td>#MSG<%= m.ContactID %></td>
+                <td><%= m.SenderName %></td>
+                <td><a href="mailto:<%= m.SenderEmail %>" style="color:var(--primary);"><%= m.SenderEmail %></a></td>
+                <td><%= m.Subject %></td>
+                <td><%= new Date(m.CreatedAt).toLocaleDateString('vi-VN') %></td>
+                <td>
+                  <span class="badge <%= m.IsProcessed ? 'active' : 'soon' %>">
+                    <%= m.IsProcessed ? 'Đã xử lý' : 'Chờ xử lý' %>
+                  </span>
+                </td>
+                <td class="actions">
+                  <button class="view-btn" onclick="viewMessage(<%= m.ContactID %>, '<%= m.SenderName.replace(/'/g, "\\'") %>', '<%= m.SenderEmail %>', '<%= m.Subject.replace(/'/g, "\\'") %>', '<%= new Date(m.CreatedAt).toLocaleString('vi-VN') %>', '<%= m.Message.replace(/'/g, "\\'").replace(/\n/g, '\\n') %>')">Xem</button>
+                  <form action="/admin/contact/<%= m.ContactID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Xóa tin nhắn này?')">
+                    <button type="submit" class="delete-btn">Xóa</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Chưa có tin nhắn nào</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Message Detail Modal -->
+  <div id="messageModal" class="message-detail">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Chi tiết tin nhắn</h2>
+        <button class="close-btn" onclick="document.getElementById('messageModal').classList.remove('show')">&times;</button>
+      </div>
+      <div class="msg-field">
+        <span class="msg-label">ID</span>
+        <span class="msg-value" id="msgId">-</span>
+      </div>
+      <div class="msg-field">
+        <span class="msg-label">Họ tên</span>
+        <span class="msg-value" id="msgName">-</span>
+      </div>
+      <div class="msg-field">
+        <span class="msg-label">Email</span>
+        <span class="msg-value"><a id="msgEmail" href="#" style="color:var(--primary);">-</a></span>
+      </div>
+      <div class="msg-field">
+        <span class="msg-label">Chủ đề</span>
+        <span class="msg-value" id="msgSubject">-</span>
+      </div>
+      <div class="msg-field">
+        <span class="msg-label">Ngày gửi</span>
+        <span class="msg-value" id="msgDate">-</span>
+      </div>
+      <div class="msg-field">
+        <span class="msg-label">Nội dung</span>
+        <span class="msg-value" id="msgContent" style="white-space: pre-wrap; background: var(--bg-dark); padding: 12px; border-radius: 6px; display: block; margin-top: 8px;">-</span>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../../components/footer') %>
+  <script src="../../js/main.js"></script>
+  <script>
+    function viewMessage(id, name, email, subject, date, message) {
+      document.getElementById('msgId').textContent = `#MSG${id}`;
+      document.getElementById('msgName').textContent = name;
+      document.getElementById('msgEmail').textContent = email;
+      document.getElementById('msgEmail').href = `mailto:${email}`;
+      document.getElementById('msgSubject').textContent = subject;
+      document.getElementById('msgDate').textContent = date;
+      document.getElementById('msgContent').textContent = message;
+      document.getElementById('messageModal').classList.add('show');
+    }
+
+    document.getElementById('messageModal')?.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('show');
+    });
+
+    document.getElementById('searchInput')?.addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      document.querySelectorAll('.admin-table tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

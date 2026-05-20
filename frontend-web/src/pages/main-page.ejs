@@ -14,6 +14,7 @@
 
   <main>
     <!-- Carousel -->
+    <% if (currentPage === 'home') { %>
     <div class="carousel-container">
       <div class="carousel-wrapper">
         <% if (typeof banners !== 'undefined' && banners.length) { %>
@@ -34,6 +35,7 @@
         <span class="dot"></span>
       </div>
     </div>
+    <% } %>
 
     <!-- Now Showing -->
     <section class="now-showing">

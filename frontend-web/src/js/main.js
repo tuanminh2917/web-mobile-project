@@ -27,6 +27,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Avatar dropdown
+  const avatarBtn = document.getElementById('avatarBtn');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+  if (avatarBtn && dropdownMenu) {
+    avatarBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('show');
+    });
+    document.addEventListener('click', function() {
+      dropdownMenu.classList.remove('show');
+    });
+    dropdownMenu.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
+
   // Popup ad - cookie based dismiss
   const popup = document.querySelector('.ad-popup');
   const popupClose = document.querySelector('.ad-popup-close');
