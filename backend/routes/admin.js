@@ -74,11 +74,47 @@ router.get('/admin/movies', requireAdmin, async (req, res) => {
 
 router.post('/admin/movies', requireAdmin, async (req, res) => {
   try {
-    const { title, genre, duration, releaseDate, status, description } = req.body;
+    const { title, genre, duration, releaseDate, status, description, director, actor, languages, censorship, posterURL } = req.body;
     await db.query(
-      'INSERT INTO Movie (Title, Genre, Duration, ReleaseDate, Status, Description) VALUES (?, ?, ?, ?, ?, ?)',
-      [title, genre, parseInt(duration) || 0, releaseDate, status, description]
+      'INSERT INTO Movie (Title, Genre, Duration, ReleaseDate, Status, Description, Director, Actor, Languages, Censorship, PosterURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [title, genre, parseInt(duration) || 0, releaseDate, status, description, director, actor, languages, censorship, posterURL]
     );
+    res.redirect('/admin/movies');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/movies');
+  }
+});
+
+router.post('/admin/movies/:id/update', requireAdmin, async (req, res) => {
+  try {
+    const { title, genre, duration, releaseDate, status, description, director, actor, languages, censorship, posterURL } = req.body;
+    await db.query(
+      'UPDATE Movie SET Title = ?, Genre = ?, Duration = ?, ReleaseDate = ?, Status = ?, Description = ?, Director = ?, Actor = ?, Languages = ?, Censorship = ?, PosterURL = ? WHERE MovieID = ?',
+      [title, genre, parseInt(duration) || 0, releaseDate, status, description, director, actor, languages, censorship, posterURL, req.params.id]
+    );
+    res.redirect('/admin/movies');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/movies');
+  }
+});
+
+router.post('/admin/movies/:id/delete', requireAdmin, async (req, res) => {
+  try {
+    // Delete related screenings and tickets first
+    const [screenings] = await db.query('SELECT ScreeningID FROM Screening WHERE MovieID = ?', [req.params.id]);
+    for (let s of screenings) {
+      await db.query('DELETE FROM Ticket WHERE ScreeningID = ?', [s.ScreeningID]);
+      await db.query('DELETE FROM Booking WHERE ScreeningID = ?', [s.ScreeningID]);
+    }
+    await db.query('DELETE FROM Screening WHERE MovieID = ?', [req.params.id]);
+    
+    // Delete comments
+    await db.query('DELETE FROM Comment WHERE MovieID = ?', [req.params.id]);
+    
+    // Delete movie
+    await db.query('DELETE FROM Movie WHERE MovieID = ?', [req.params.id]);
     res.redirect('/admin/movies');
   } catch (err) {
     console.error(err);

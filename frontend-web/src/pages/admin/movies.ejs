@@ -45,6 +45,7 @@
             <th>Tên phim</th>
             <th>Thể loại</th>
             <th>Thời lượng</th>
+            <th>Đạo diễn</th>
             <th>Trạng thái</th>
             <th>Hành động</th>
           </tr>
@@ -58,19 +59,22 @@
                 <td><%= m.Title %></td>
                 <td><%= m.Genre %></td>
                 <td><%= m.Duration %> phút</td>
+                <td><%= m.Director || 'N/A' %></td>
                 <td>
                   <span class="badge <%= m.Status === 'On Going' ? 'active' : m.Status === 'Up Coming' ? 'soon' : 'inactive' %>">
                     <%= m.Status === 'On Going' ? 'Đang chiếu' : m.Status === 'Up Coming' ? 'Sắp chiếu' : 'Ngừng chiếu' %>
                   </span>
                 </td>
                 <td class="actions">
-                  <button class="edit-btn">Sửa</button>
-                  <button class="delete-btn" onclick="if(confirm('Xóa phim này?'))alert('Đã xóa')">Xóa</button>
+                  <button class="edit-btn" onclick="editMovie(<%= m.MovieID %>, '<%= m.Title.replace(/'/g, "\\'") %>', '<%= m.Genre %>', <%= m.Duration %>, '<%= m.ReleaseDate.split('T')[0] %>', '<%= m.Status %>', '<%= m.Description ? m.Description.replace(/'/g, "\\'").replace(/\n/g, '\\n') : '' %>', '<%= m.Director || '' %>', '<%= m.Actor ? m.Actor.replace(/'/g, "\\'") : '' %>', '<%= m.Languages || '' %>', '<%= m.Censorship || '' %>', '<%= m.PosterURL || '' %>')">Sửa</button>
+                  <form action="/admin/movies/<%= m.MovieID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Xóa phim này? (Sẽ xóa tất cả suất chiếu và vé liên quan)')">
+                    <button type="submit" class="delete-btn">Xóa</button>
+                  </form>
                 </td>
               </tr>
             <% }); %>
           <% } else { %>
-            <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Chưa có phim nào</td></tr>
+            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Chưa có phim nào</td></tr>
           <% } %>
         </tbody>
       </table>
@@ -79,7 +83,7 @@
 
   <!-- Add Movie Modal -->
   <div id="addModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;padding:60px 20px;overflow-y:auto;">
-    <div style="max-width:600px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
+    <div style="max-width:700px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
       <h2 style="color:var(--text-light);margin-bottom:20px;">Thêm phim mới</h2>
       <form action="/admin/movies" method="POST" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div style="grid-column:span 2;">
@@ -95,6 +99,29 @@
           <input type="number" name="duration" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
         </div>
         <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Đạo diễn</label>
+          <input type="text" name="director" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Diễn viên</label>
+          <input type="text" name="actor" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Ngôn ngữ</label>
+          <input type="text" name="languages" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Phân loại (P/K/T13/T16/T18)</label>
+          <select name="censorship" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+            <option value="">Chọn...</option>
+            <option value="P">P</option>
+            <option value="K">K</option>
+            <option value="T13">T13</option>
+            <option value="T16">T16</option>
+            <option value="T18">T18</option>
+          </select>
+        </div>
+        <div>
           <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Ngày khởi chiếu</label>
           <input type="date" name="releaseDate" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
         </div>
@@ -105,6 +132,10 @@
             <option value="Up Coming">Sắp chiếu</option>
             <option value="Stoped">Ngừng chiếu</option>
           </select>
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">URL Poster</label>
+          <input type="url" name="posterURL" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
         </div>
         <div style="grid-column:span 2;">
           <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Mô tả</label>
@@ -118,9 +149,100 @@
     </div>
   </div>
 
+  <!-- Edit Movie Modal -->
+  <div id="editModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;padding:60px 20px;overflow-y:auto;">
+    <div style="max-width:700px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
+      <h2 style="color:var(--text-light);margin-bottom:20px;">Sửa phim</h2>
+      <form id="editForm" method="POST" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="grid-column:span 2;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Tên phim</label>
+          <input type="text" id="editTitle" name="title" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Thể loại</label>
+          <input type="text" id="editGenre" name="genre" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Thời lượng (phút)</label>
+          <input type="number" id="editDuration" name="duration" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Đạo diễn</label>
+          <input type="text" id="editDirector" name="director" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Diễn viên</label>
+          <input type="text" id="editActor" name="actor" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Ngôn ngữ</label>
+          <input type="text" id="editLanguages" name="languages" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Phân loại (P/K/T13/T16/T18)</label>
+          <select id="editCensorship" name="censorship" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+            <option value="">Chọn...</option>
+            <option value="P">P</option>
+            <option value="K">K</option>
+            <option value="T13">T13</option>
+            <option value="T16">T16</option>
+            <option value="T18">T18</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Ngày khởi chiếu</label>
+          <input type="date" id="editReleaseDate" name="releaseDate" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Trạng thái</label>
+          <select id="editStatus" name="status" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+            <option value="On Going">Đang chiếu</option>
+            <option value="Up Coming">Sắp chiếu</option>
+            <option value="Stoped">Ngừng chiếu</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">URL Poster</label>
+          <input type="url" id="editPosterURL" name="posterURL" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);">
+        </div>
+        <div style="grid-column:span 2;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Mô tả</label>
+          <textarea id="editDescription" name="description" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);min-height:80px;"></textarea>
+        </div>
+        <div style="grid-column:span 2;display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('editModal').style.display='none'">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <%- include('../../components/footer') %>
   <script src="../../js/main.js"></script>
   <script>
+    function editMovie(id, title, genre, duration, releaseDate, status, description, director, actor, languages, censorship, posterURL) {
+      document.getElementById('editTitle').value = title;
+      document.getElementById('editGenre').value = genre;
+      document.getElementById('editDuration').value = duration;
+      document.getElementById('editDirector').value = director;
+      document.getElementById('editActor').value = actor;
+      document.getElementById('editLanguages').value = languages;
+      document.getElementById('editCensorship').value = censorship;
+      document.getElementById('editReleaseDate').value = releaseDate;
+      document.getElementById('editStatus').value = status;
+      document.getElementById('editPosterURL').value = posterURL;
+      document.getElementById('editDescription').value = description;
+      document.getElementById('editForm').action = `/admin/movies/${id}/update`;
+      document.getElementById('editModal').style.display = 'block';
+    }
+
+    document.getElementById('editModal')?.addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+    document.getElementById('addModal')?.addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+
     document.getElementById('searchInput')?.addEventListener('input', function() {
       const q = this.value.toLowerCase();
       document.querySelectorAll('.admin-table tbody tr').forEach(row => {
