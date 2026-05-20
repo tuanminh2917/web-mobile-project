@@ -14,11 +14,11 @@
 
   <main>
     <div class="login-container">
-      <% if (typeof success !== 'undefined' && success) { %>
-        <div class="success-message" id="successMsg">
-          <p><%= success %></p>
-          <button onclick="window.location.href='<%= typeof redirectUrl !== 'undefined' ? redirectUrl : '/' %>'" class="btn btn-primary">Đóng</button>
-        </div>
+       <% if (typeof success !== 'undefined' && success) { %>
+         <div class="success-message" id="successMsg">
+           <p><%= success %></p>
+           <button onclick="window.location.href='<%= typeof redirectUrl !== \"undefined\" ? redirectUrl : \"/\" %>'" class="btn btn-primary">Đóng</button>
+         </div>
       <% } else { %>
         <h2>Đăng nhập</h2>
         <% if (typeof error !== 'undefined' && error) { %>
