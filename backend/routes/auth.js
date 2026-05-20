@@ -36,7 +36,7 @@ router.post('/login', async (req, res) => {
       return res.render('login', { currentPage: 'login', error: 'Sai tên đăng nhập hoặc mật khẩu', success: null, formData: req.body });
     }
 
-    req.session.user = {
+     req.session.user = {
       UserID: user.UserID,
       Username: user.Username,
       FullName: user.FullName,
@@ -45,7 +45,7 @@ router.post('/login', async (req, res) => {
     };
 
     const redirectUrl = user.Role === 'Admin' ? '/admin/dashboard' : '/';
-    res.render('login', { currentPage: 'login', error: null, success: 'Đăng nhập thành công!', redirectUrl, formData: {} });
+    res.redirect(redirectUrl);
   } catch (err) {
     console.error(err);
     res.render('login', { currentPage: 'login', error: 'Lỗi hệ thống', success: null, formData: req.body });
