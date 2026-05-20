@@ -17,6 +17,7 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log('Login attempt:', username);
 
     if (!username || !password) {
       return res.render('login', { currentPage: 'login', error: 'Vui lòng nhập đầy đủ thông tin', success: null, formData: req.body });
@@ -25,6 +26,7 @@ router.post('/login', async (req, res) => {
     const [users] = await db.query(
       'SELECT * FROM User WHERE Username = ?', [username]
     );
+    console.log('Users found:', users.length);
 
     if (users.length === 0) {
       return res.render('login', { currentPage: 'login', error: 'Sai tên đăng nhập hoặc mật khẩu', success: null, formData: req.body });
@@ -32,23 +34,29 @@ router.post('/login', async (req, res) => {
 
     const user = users[0];
     const match = await bcrypt.compare(password, user.Password);
+    console.log('Password match:', match);
+    
     if (!match) {
       return res.render('login', { currentPage: 'login', error: 'Sai tên đăng nhập hoặc mật khẩu', success: null, formData: req.body });
     }
 
-     req.session.user = {
+    req.session.user = {
       UserID: user.UserID,
       Username: user.Username,
       FullName: user.FullName,
       Email: user.Email,
       Role: user.Role
     };
+    console.log('Session set for user:', user.Username);
 
     const redirectUrl = user.Role === 'Admin' ? '/admin/dashboard' : '/';
-    res.redirect(redirectUrl);
+    console.log('Rendering login with redirectUrl:', redirectUrl);
+    
+    res.render('login', { currentPage: 'login', error: null, success: 'Đăng nhập thành công!', redirectUrl, formData: {} });
   } catch (err) {
-    console.error(err);
-    res.render('login', { currentPage: 'login', error: 'Lỗi hệ thống', success: null, formData: req.body });
+    console.error('Login error:', err);
+    console.error('Stack:', err.stack);
+    res.render('login', { currentPage: 'login', error: 'Lỗi hệ thống: ' + err.message, success: null, formData: req.body });
   }
 });
 

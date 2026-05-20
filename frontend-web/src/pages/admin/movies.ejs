@@ -66,7 +66,7 @@
                   </span>
                 </td>
                 <td class="actions">
-                  <button class="edit-btn" onclick="editMovie(<%= m.MovieID %>, '<%= m.Title.replace(/'/g, "\\'") %>', '<%= m.Genre %>', <%= m.Duration %>, '<%= m.ReleaseDate.split('T')[0] %>', '<%= m.Status %>', '<%= m.Description ? m.Description.replace(/'/g, "\\'").replace(/\n/g, '\\n') : '' %>', '<%= m.Director || '' %>', '<%= m.Actor ? m.Actor.replace(/'/g, "\\'") : '' %>', '<%= m.Languages || '' %>', '<%= m.Censorship || '' %>', '<%= m.PosterURL || '' %>')">Sửa</button>
+                  <button class="edit-btn" onclick="editMovie(<%= m.MovieID %>, '<%= m.Title.replace(/'/g, "\\'") %>', '<%= m.Genre %>', <%= m.Duration %>, '<%= m.ReleaseDate ? new Date(m.ReleaseDate.getTime() - m.ReleaseDate.getTimezoneOffset() * 60000).toISOString().split('T')[0] : '' %>', '<%= m.Status %>', '<%= m.Description ? m.Description.replace(/'/g, "\\'").replace(/\n/g, '\\n') : '' %>', '<%= m.Director || '' %>', '<%= m.Actor ? m.Actor.replace(/'/g, "\\'") : '' %>', '<%= m.Languages || '' %>', '<%= m.Censorship || '' %>', '<%= m.PosterURL || '' %>')">Sửa</button>
                   <form action="/admin/movies/<%= m.MovieID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Xóa phim này? (Sẽ xóa tất cả suất chiếu và vé liên quan)')">
                     <button type="submit" class="delete-btn">Xóa</button>
                   </form>

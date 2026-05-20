@@ -5,3 +5,11 @@ server.js
 package-lock.json
 package.json
 
+# Junk files and temporary scripts
+*.pdf
+*.docx
+*.txt
+*_extracted/
+fix*.js
+test*.js
+backend/sessions/
