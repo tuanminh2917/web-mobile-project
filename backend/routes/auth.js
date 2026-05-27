@@ -24,7 +24,7 @@ router.post('/login', async (req, res) => {
     }
 
     const [users] = await db.query(
-      'SELECT * FROM User WHERE Username = ?', [username]
+      'SELECT * FROM User WHERE LOWER(Username) = LOWER(?) OR LOWER(Email) = LOWER(?)', [username, username]
     );
     console.log('Users found:', users.length);
 
@@ -49,10 +49,12 @@ router.post('/login', async (req, res) => {
     };
     console.log('Session set for user:', user.Username);
 
-    const redirectUrl = user.Role === 'Admin' ? '/admin/dashboard' : '/';
-    console.log('Rendering login with redirectUrl:', redirectUrl);
-    
-    res.render('login', { currentPage: 'login', error: null, success: 'Đăng nhập thành công!', redirectUrl, formData: {} });
+    // Determine redirect based on role and perform redirect
+    // Determine redirect based on role (case-insensitive)
+    const isAdmin = typeof user.Role === 'string' && user.Role.toLowerCase() === 'admin';
+    const redirectUrl = isAdmin ? '/admin/dashboard' : '/';
+    console.log('User role:', user.Role, 'Redirect URL:', redirectUrl);
+    return res.redirect(redirectUrl);
   } catch (err) {
     console.error('Login error:', err);
     console.error('Stack:', err.stack);
