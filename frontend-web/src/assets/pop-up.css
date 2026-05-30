@@ -1,0 +1,57 @@
+/* Lớp nền mờ phủ toàn màn hình (Overlay) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu đen trong suốt */
+    display: none; /* Ẩn mặc định */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Nội dung của Pop-up */
+.modal-content {
+    background-color: rgba(0, 0, 0, 0.285); /* Nền trong suốt */
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    max-width: calc(100% - 40px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+/* Hiệu ứng hiện ra mượt mà */
+@keyframes fadeIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Nút đóng bên trong Pop-up */
+.close-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    background-color: #a71d2a;
+}
