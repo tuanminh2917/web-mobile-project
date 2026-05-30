@@ -1,8 +1,6 @@
 node_modules/
 miscellanea/
 docs/
-package-lock.json
-package.json
 
 # Junk files and temporary scripts
 *.pdf
