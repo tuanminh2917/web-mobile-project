@@ -2,6 +2,8 @@ node_modules/
 miscellanea/
 docs/
 
+backend/database/db.js
+
 # Junk files and temporary scripts
 *.pdf
 *.docx

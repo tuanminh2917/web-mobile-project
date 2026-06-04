@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán</title>
+    <link rel="stylesheet" href="../assets/payment.css">
+</head>
+
+<body>
+    {% include ../components/header.ejs %}
+
+    <div class="payment-container">
+        <h1>Thanh toán</h1>
+        
+        <div class="payment-content">
+            <!--Thông tin đặt hàng-->
+            <div class="order-infor">
+                <h3>Thông tin đặt hàng</h3>
+                <p><strong>Phim:</strong><span id="movie-title"></span></p>
+                <p><strong>Suất chiếu:</strong> <span id="showtime"></span></p>
+                <p><strong>Ghế đã chọn:</strong> <span id="selected-seats"></span></p>
+                <p><strong>Tổng tiền:</strong> <span id="total-price"></span> VND</p>
+            </div>
+            <!-- QR Code -->
+            <div class="qr-code">
+                <h3>Quét mã QR để thanh toán</h3>
+                <img src="path/to/qr-code.png" alt="QR Code">
+            </div>
+        </div>
+
+        <button id="confirm-payment">Xác nhận thanh toán</button>
+    </div>
+
+    {% include ../components/footer.ejs %}
+</body>
+</html>

@@ -1,0 +1,169 @@
+:root {
+    --bg-dark: #05070a;
+    --bg-deep-blue: #0f172a;
+    --text-main: #e2e8f0;
+    --color-standard: #f97316; /* Cam */
+    --color-vip: #dc2626;      /* Đỏ */
+    --color-couple: #2563eb;   /* Xanh dương */
+    --color-selected: #ffffff;
+    --color-occupied: #334155;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+}
+
+.cinema-container {
+    background-color: var(--bg-deep-blue);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+/* Màn hình */
+.screen-wrap {
+    perspective: 500px;
+    margin-bottom: 50px;
+}
+.screen {
+    height: 10px;
+    width: 90%;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.7);
+    transform: rotateX(-45deg);
+}
+
+/* Bố cục ghế */
+.seating-grid {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.row-label {
+    width: 25px;
+    font-weight: bold;
+    color: #64748b;
+}
+
+/* Ẩn checkbox mặc định */
+.seat-input {
+    display: none;
+}
+
+/* Thiết kế ghế */
+.seat-label {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border: 2px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 32px;
+    transition: 0.2s;
+    user-select: none;
+}
+
+/* Phân loại màu ghế */
+.row-standard .seat-label { border-color: var(--color-standard); color: var(--color-standard); }
+.row-vip .seat-label { border-color: var(--color-vip); color: var(--color-vip); }
+.row-couple .seat-label { border-color: var(--color-couple); color: var(--color-couple); }
+
+/* Hiệu ứng khi được chọn (Checked) */
+.seat-input:checked + .seat-label {
+    background-color: var(--color-selected);
+    color: var(--bg-dark);
+    border-color: var(--color-selected);
+}
+
+/* Ghế đã được đặt */
+.seat-input.occupied + .seat-label {
+    background-color: var(--color-occupied);
+    border-color: var(--color-occupied);
+    color: #1e293b;
+    cursor: not-allowed;
+}
+
+/* Chú thích */
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    border-top: 1px solid #1e293b;
+    padding-top: 20px;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+.box { width: 15px; height: 15px; border-radius: 2px; border: 1px solid; }
+
+/* Thông tin phòng chiếu*/
+.room-infor {
+    position: relative;
+    width: calc(100% - 48px);
+    margin: 0 auto 20px;
+    background-color: var(--bg-deep-blue);
+    padding: 1px 24px;
+    border-radius: 5px;
+    border-color: white;
+    border: 1px solid;
+    font-weight: bold;
+    font-size: 20px;
+    color: #cbd5e1;
+    text-align: left;
+}
+
+/* Thống kê đặt vé */
+.booking-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--bg-deep-blue);
+    border-radius: 10px;
+    border: 1px solid white;
+}    
+
+.booking-summary .booking-info p {
+    margin: 0;
+    font-size: 16px;
+    text-align: left;
+}
+
+.booking-summary .booking-info p span {
+    font-weight: bold;
+    color: var(--color-selected);
+}
+
+.booking-summary button {
+    padding: 10px 20px;
+    background-color: var(--color-standard);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: bold;
+}
+
+.booking-summary button:hover {
+    background-color: var(--color-vip); /* darker */
+}

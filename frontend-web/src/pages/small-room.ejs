@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn Ghế Xem Phim</title>
+    <link rel="stylesheet" href="../assets/room.css">
+</head>
+<body>
+
+<div class="cinema-container">
+    <div class="room-infor">
+        <p>Phòng: <span></span> | Thời gian: <span></span></p>
+        <!-- <p>Kích thước phòng: <span></span></p> -->
+        <p>Phim: <span></span></p>
+    </div>
+    <div class="screen-wrap">
+        <div class="screen"></div>
+        <p style="margin-top: 15px; letter-spacing: 5px; color: #475569;">MÀN HÌNH</p>
+    </div>
+
+    <div class="seating-grid">
+        <div class="row row-standard">
+            <span class="row-label">A</span>
+            <input type="checkbox" id="A1" class="seat-input"><label for="A1" class="seat-label">1</label>
+            <input type="checkbox" id="A2" class="seat-input"><label for="A2" class="seat-label">2</label>
+            <input type="checkbox" id="A3" class="seat-input"><label for="A3" class="seat-label">3</label>
+            <input type="checkbox" id="A4" class="seat-input occupied" disabled><label for="A4" class="seat-label">4</label>
+            <input type="checkbox" id="A5" class="seat-input"><label for="A5" class="seat-label">5</label>
+            <input type="checkbox" id="A6" class="seat-input"><label for="A6" class="seat-label">6</label>
+            <input type="checkbox" id="A7" class="seat-input"><label for="A7" class="seat-label">7</label>
+            <input type="checkbox" id="A8" class="seat-input"><label for="A8" class="seat-label">8</label>
+            <input type="checkbox" id="A9" class="seat-input"><label for="A9" class="seat-label">9</label>
+            <input type="checkbox" id="A10" class="seat-input"><label for="A10" class="seat-label">10</label>
+        </div>
+
+        <div class="row row-vip">
+            <span class="row-label">E</span>
+            <input type="checkbox" id="E1" class="seat-input"><label for="E1" class="seat-label">1</label>
+            <input type="checkbox" id="E2" class="seat-input"><label for="E2" class="seat-label">2</label>
+            <input type="checkbox" id="E3" class="seat-input"><label for="E3" class="seat-label">3</label>
+            <input type="checkbox" id="E4" class="seat-input"><label for="E4" class="seat-label">4</label>
+            <input type="checkbox" id="E5" class="seat-input"><label for="E5" class="seat-label">5</label>
+            <input type="checkbox" id="E6" class="seat-input"><label for="E6" class="seat-label">6</label>
+            <input type="checkbox" id="E7" class="seat-input"><label for="E7" class="seat-label">7</label>
+            <input type="checkbox" id="E8" class="seat-input"><label for="E8" class="seat-label">8</label>
+            <input type="checkbox" id="E9" class="seat-input"><label for="E9" class="seat-label">9</label>
+            <input type="checkbox" id="E10" class="seat-input"><label for="E10" class="seat-label">10</label>
+        </div>
+
+        <div class="row row-couple">
+            <span class="row-label">I</span>
+            <input type="checkbox" id="I1" class="seat-input"><label for="I1" class="seat-label">1</label>
+            <input type="checkbox" id="I2" class="seat-input"><label for="I2" class="seat-label">2</label>
+            <input type="checkbox" id="I3" class="seat-input"><label for="I3" class="seat-label">3</label>
+            <input type="checkbox" id="I4" class="seat-input"><label for="I4" class="seat-label">4</label>
+            <input type="checkbox" id="I5" class="seat-input"><label for="I5" class="seat-label">5</label>
+            <input type="checkbox" id="I6" class="seat-input"><label for="I6" class="seat-label">6</label>
+            <input type="checkbox" id="I7" class="seat-input"><label for="I7" class="seat-label">7</label>
+            <input type="checkbox" id="I8" class="seat-input"><label for="I8" class="seat-label">8</label>
+            <input type="checkbox" id="I9" class="seat-input"><label for="I9" class="seat-label">9</label>
+            <input type="checkbox" id="I10" class="seat-input"><label for="I10" class="seat-label">10</label>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="box" style="border-color: var(--color-standard);"></div> Ghế thường</div>
+        <div class="legend-item"><div class="box" style="border-color: var(--color-vip);"></div> Ghế VIP</div>
+        <div class="legend-item"><div class="box" style="border-color: var(--color-couple);"></div> Couple seat</div>
+        <div class="legend-item"><div class="box" style="background: #fff;"></div> Đang chọn</div>
+        <div class="legend-item"><div class="box" style="background: var(--color-occupied);"></div> Đã đặt</div>
+    </div>
+
+    <div class="booking-summary" >
+        <div class="booking-info">
+            <p>Ghế đã chọn: <span id="selected-seats">0</span></p>
+            <p>Tổng tiền: <span id="total-price">0</span> VND</p>
+        </div>
+        <button style="padding: 10px 20px; background-color: var(--color-standard); color: #fff; border: none; border-radius: 5px; cursor: pointer;">Đặt vé</button>
+    </div>
+</div>
+
+</body>
+</html>
