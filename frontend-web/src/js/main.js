@@ -43,23 +43,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Popup ad - cookie based dismiss
-  const popup = document.querySelector('.ad-popup');
-  const popupClose = document.querySelector('.ad-popup-close');
-  if (popup && popupClose) {
-    if (!localStorage.getItem('adPopupDismissed')) {
-      setTimeout(() => popup.classList.add('show'), 2000);
-    }
-    popupClose.addEventListener('click', function() {
-      popup.classList.remove('show');
-      localStorage.setItem('adPopupDismissed', 'true');
-    });
-    popup.addEventListener('click', function(e) {
-      if (e.target === this) {
-        popup.classList.remove('show');
-        localStorage.setItem('adPopupDismissed', 'true');
-      }
-    });
+  // ===================== AD POPUP (trang chủ, hiện sau 1 phút) =====================
+  const adOverlay = document.getElementById('adPopupOverlay');
+  if (adOverlay) {
+    // Hiện sau 60 giây (1 phút)
+    setTimeout(function() {
+      adOverlay.classList.add('active');
+    }, 60000);
   }
 
   // View counter animation
@@ -78,3 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 40);
   });
 });
+
+// Hàm đóng popup quảng cáo (global, gọi từ HTML)
+function closeAdPopup(event, force) {
+  const overlay = document.getElementById('adPopupOverlay');
+  if (!overlay) return;
+  // Nếu click vào overlay (nền tối), đóng popup
+  if (force || (event && event.target === overlay)) {
+    overlay.classList.remove('active');
+  }
+}

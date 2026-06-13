@@ -1,3 +1,31 @@
+/* ===== BOOKING STEPS (breadcrumb) ===== */
+.booking-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+.booking-steps .step {
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+.booking-steps .step.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.booking-steps .step.done {
+  color: #4caf50;
+  border-color: #4caf50;
+}
+.booking-steps .step-arrow {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
 .seat-page {
   max-width: 900px;
   margin: 40px auto;

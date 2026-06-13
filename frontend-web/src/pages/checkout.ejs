@@ -14,11 +14,29 @@
 
   <main>
     <div class="checkout-page">
+
+      <!-- Breadcrumb -->
+      <div class="booking-steps">
+        <span class="step done">1. Chọn phim</span>
+        <span class="step-arrow">›</span>
+        <span class="step done">2. Chọn ghế</span>
+        <span class="step-arrow">›</span>
+        <span class="step active">3. Thanh toán</span>
+      </div>
+
       <h1>Xác nhận thanh toán</h1>
 
+      <!-- Countdown timer -->
+      <div class="countdown-bar" id="countdownBar">
+        <span>⏱ Vé được giữ trong: </span>
+        <span id="countdownTimer" class="countdown-time">10:00</span>
+        <span> — Vui lòng thanh toán trước khi hết giờ!</span>
+      </div>
+
       <div class="checkout-grid">
+        <!-- Thông tin đặt vé -->
         <div class="checkout-section">
-          <h2>Thông tin đặt vé</h2>
+          <h2>📋 Thông tin đặt vé</h2>
           <div class="info-row">
             <span>Phim</span>
             <span class="value"><%= movie.Title %></span>
@@ -35,6 +53,10 @@
             <span>Ghế</span>
             <span class="value"><%= seats.map(s => s.row + s.number).join(', ') %></span>
           </div>
+          <div class="info-row">
+            <span>Mã đơn</span>
+            <span class="value booking-code">#BK<%= bookingID %></span>
+          </div>
           <hr class="divider">
           <% seats.forEach(s => { %>
             <div class="info-row">
@@ -49,28 +71,122 @@
           </div>
         </div>
 
+        <!-- Thanh toán QR -->
         <div class="checkout-section">
-          <h2>Thanh toán</h2>
+          <h2>💳 Thanh toán QR</h2>
           <div class="qr-section">
+            <p class="qr-instruction">Quét mã QR bằng ứng dụng ngân hàng để thanh toán</p>
             <div class="qr-placeholder">
-              <img src="/assets/qr-placeholder.png" alt="QR Code">
+              <!-- QR code thực tạo từ QR Server API -->
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?data=CINEMA-BK<%= bookingID %>-<%= total %>&size=200x200&color=000000&bgcolor=ffffff&qzone=2"
+                alt="QR Code thanh toán"
+                width="200" height="200"
+              >
             </div>
-            <p>Quét mã QR để thanh toán qua ứng dụng ngân hàng</p>
-            <p style="font-size:12px;color:var(--text-muted);">Số tiền: <strong style="color:var(--accent);"><%= total.toLocaleString() %>đ</strong></p>
-            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Nội dung chuyển khoản: <strong style="color:var(--text-light);">BOOKING<%= bookingID %></strong></p>
+
+            <div class="payment-info-box">
+              <div class="pay-info-row">
+                <span class="pay-label">Ngân hàng</span>
+                <span class="pay-val">Vietcombank</span>
+              </div>
+              <div class="pay-info-row">
+                <span class="pay-label">Số tài khoản</span>
+                <span class="pay-val copy-target" id="bankAccNum" onclick="copyText('bankAccNum')">1234567890</span>
+              </div>
+              <div class="pay-info-row">
+                <span class="pay-label">Chủ tài khoản</span>
+                <span class="pay-val">CINEMA DAI BANG</span>
+              </div>
+              <div class="pay-info-row">
+                <span class="pay-label">Số tiền</span>
+                <span class="pay-val highlight"><%= total.toLocaleString() %>đ</span>
+              </div>
+              <div class="pay-info-row">
+                <span class="pay-label">Nội dung CK</span>
+                <span class="pay-val copy-target" id="payContent" onclick="copyText('payContent')">BOOKING<%= bookingID %></span>
+              </div>
+            </div>
+
             <hr class="divider">
-            <form action="/book/<%= screeningID %>/pay" method="POST">
+            <p class="pay-note">Sau khi chuyển khoản thành công, nhấn nút bên dưới để xác nhận.</p>
+
+            <form action="/book/<%= screeningID %>/pay" method="POST" id="payForm">
               <input type="hidden" name="bookingID" value="<%= bookingID %>">
-              <button type="submit" class="btn btn-primary payment-btn">Xác nhận đã thanh toán</button>
+              <button type="submit" class="btn btn-primary payment-btn" id="payBtn">
+                ✅ Xác nhận đã thanh toán
+              </button>
             </form>
-            <p style="margin-top:12px;font-size:12px;color:var(--text-muted);">Vé sẽ được giữ trong 10 phút. Vui lòng thanh toán trước khi hết giờ.</p>
           </div>
         </div>
       </div>
+
     </div>
   </main>
 
   <%- include('../components/footer') %>
   <script src="../js/main.js"></script>
+  <script>
+    // Countdown timer 10 phút
+    (function() {
+      const SESSION_KEY = 'booking_expire_<%= bookingID %>';
+      let expire = parseInt(sessionStorage.getItem(SESSION_KEY));
+      const now = Date.now();
+      if (!expire || expire < now) {
+        expire = now + 10 * 60 * 1000;
+        sessionStorage.setItem(SESSION_KEY, expire);
+      }
+
+      const timerEl = document.getElementById('countdownTimer');
+      const barEl = document.getElementById('countdownBar');
+
+      function update() {
+        const remaining = expire - Date.now();
+        if (remaining <= 0) {
+          timerEl.textContent = '00:00';
+          barEl.classList.add('expired');
+          timerEl.textContent = '00:00 — Đơn hàng đã hết hạn!';
+          document.getElementById('payBtn').disabled = true;
+          clearInterval(timer);
+          return;
+        }
+        const m = Math.floor(remaining / 60000);
+        const s = Math.floor((remaining % 60000) / 1000);
+        timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if (remaining < 120000) barEl.classList.add('urgent');
+      }
+
+      update();
+      const timer = setInterval(update, 1000);
+    })();
+
+    // Sao chép text
+    function copyText(elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const text = el.textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = el.textContent;
+        el.textContent = '✓ Đã sao chép!';
+        el.style.color = '#4caf50';
+        setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 1500);
+      }).catch(() => {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      });
+    }
+
+    // Prevent double submit
+    document.getElementById('payForm').addEventListener('submit', function() {
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Đang xử lý...';
+    });
+  </script>
 </body>
 </html>

@@ -14,12 +14,21 @@
 
   <main>
     <div class="seat-page">
+      <!-- Breadcrumb -->
+      <div class="booking-steps">
+        <span class="step done">1. Chọn phim</span>
+        <span class="step-arrow">›</span>
+        <span class="step active">2. Chọn ghế</span>
+        <span class="step-arrow">›</span>
+        <span class="step">3. Thanh toán</span>
+      </div>
+
       <h1>Chọn ghế ngồi</h1>
       <p class="subtitle"><%= movie.Title %> &middot; <%= roomName %> &middot; <%= new Date(startTime).toLocaleString('vi-VN') %></p>
 
       <% if (typeof error !== 'undefined' && error) { %>
         <div class="alert alert-error" id="errorMsg">
-          <span><%= error %></span>
+          <span>⚠ <%= error %></span>
           <button type="button" onclick="document.getElementById('errorMsg').style.display='none'" class="btn-close">Đóng</button>
         </div>
       <% } %>
@@ -65,10 +74,10 @@
       const form = document.getElementById('bookingForm');
 
       // Enable/disable confirm button based on selection
-      const observer = setInterval(() => {
+      setInterval(() => {
         if (seatMap.getSelectedSeats().length > 0) {
           confirmBtn.disabled = false;
-          confirmBtn.textContent = `Thanh toán - ${seatMap.getTotal().toLocaleString()}đ`;
+          confirmBtn.textContent = `Tiến hành thanh toán — ${seatMap.getTotal().toLocaleString()}đ`;
         } else {
           confirmBtn.disabled = true;
           confirmBtn.textContent = 'Tiến hành thanh toán';
@@ -77,7 +86,11 @@
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-        seatsInput.value = JSON.stringify(seatMap.getSelectedSeats());
+        const selected = seatMap.getSelectedSeats();
+        if (selected.length === 0) return;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Đang xử lý...';
+        seatsInput.value = JSON.stringify(selected);
         totalInput.value = seatMap.getTotal();
         this.submit();
       });
