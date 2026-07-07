@@ -64,6 +64,7 @@ app.use(contactRoutes);
 app.get('/', async (req, res) => {
   let nowShowing = [];
   let comingSoon = [];
+  let activeAd = null;
 
   try {
     const db = require('./database/db');
@@ -81,12 +82,24 @@ app.get('/', async (req, res) => {
     comingSoon = coming;
   } catch (err) { console.error('DB home:', err.message); }
 
+  try {
+    const db = require('./database/db');
+    const [ads] = await db.query(
+      "SELECT * FROM Advertisement WHERE IsActive = TRUE LIMIT 1"
+    );
+    if (ads.length > 0) {
+      activeAd = ads[0];
+    }
+  } catch (err) { console.error('DB ad:', err.message); }
+
   res.render('main-page', {
     currentPage: 'home',
     nowShowing,
-    comingSoon
+    comingSoon,
+    activeAd
   });
 });
+
 
 // About
 app.get('/about', (req, res) => {

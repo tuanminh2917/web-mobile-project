@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lịch chiếu - Cinema</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <link rel="stylesheet" href="../assets/showtime.css">
-  <link rel="stylesheet" href="../assets/responsive.css">
-  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/showtime.css">
+  <link rel="stylesheet" href="/assets/responsive.css">
+  <link rel="stylesheet" href="/assets/common.css">
 </head>
 <body>
   <%- include('../components/header', { currentPage: 'showtime' }) %>
@@ -49,7 +49,14 @@
       <div class="screening-list">
         <% if (typeof screenings !== 'undefined' && screenings.length) { %>
           <% screenings.forEach(s => { %>
-            <div class="screening-card" data-movie="<%= s.MovieID %>">
+            <% 
+              const sDate = new Date(s.StartTime);
+              const year = sDate.getFullYear();
+              const month = String(sDate.getMonth() + 1).padStart(2, '0');
+              const dateVal = String(sDate.getDate()).padStart(2, '0');
+              const dateStr = `${year}-${month}-${dateVal}`;
+            %>
+            <div class="screening-card" data-movie="<%= s.MovieID %>" data-date="<%= dateStr %>">
               <img src="<%= s.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= s.MovieTitle %>" class="movie-thumb">
               <div class="info">
                 <h3><%= s.MovieTitle %></h3>
@@ -59,7 +66,7 @@
               <div class="time-price">
                 <div class="time"><%= new Date(s.StartTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %></div>
                 <div class="price"><%= s.BasePrice.toLocaleString() %>đ</div>
-                <a href="/book/<%= s.ScreeningID %>" class="btn btn-sm btn-primary" style="margin-top:8px;">Chọn ghế</a>
+                <a href="/book/<%= s.ScreeningID %>" class="showtime-btn btn btn-sm btn-primary" data-date="<%= dateStr %>">Chọn ghế</a>
               </div>
             </div>
           <% }); %>
@@ -122,7 +129,7 @@
   </main>
 
   <%- include('../components/footer') %>
-  <script src="../js/main.js"></script>
+  <script src="/js/main.js"></script>
   <script>
     document.getElementById('movieFilter')?.addEventListener('change', function() {
       const val = this.value;

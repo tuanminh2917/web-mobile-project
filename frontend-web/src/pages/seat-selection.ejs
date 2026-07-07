@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chọn ghế - Cinema</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <link rel="stylesheet" href="../assets/seat-selection.css">
-  <link rel="stylesheet" href="../assets/responsive.css">
-  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/seat-selection.css">
+  <link rel="stylesheet" href="/assets/responsive.css">
+  <link rel="stylesheet" href="/assets/common.css">
 </head>
 <body>
   <%- include('../components/header', { currentPage: 'booking' }) %>
@@ -46,16 +46,20 @@
   </main>
 
   <%- include('../components/footer') %>
-  <script src="../js/seat-map.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/seat-map.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const occupiedSeats = <%= JSON.stringify(occupiedSeats || []) %>;
-      const seatTypes = <%= JSON.stringify(seatTypes || {}) %>;
+      const occupiedSeats = <%- JSON.stringify(occupiedSeats || []) %>;
+      const seatTypes = <%- JSON.stringify(seatTypes || {}) %>;
       const seatsPerRow = <%= seatsPerRow || 12 %>;
       const rows = <%= rows || 10 %>;
       const regularPrice = <%= regularPrice || 50000 %>;
       const vipPrice = <%= vipPrice || 65000 %>;
       const couplePrice = <%= couplePrice || 130000 %>;
+
+      console.log('[DEBUG] rows:', rows, 'seatsPerRow:', seatsPerRow, 'seatTypes keys:', Object.keys(seatTypes).length);
+      console.log('[DEBUG] SeatMap class available:', typeof SeatMap);
 
       const seatMap = new SeatMap('#seatMapContainer', {
         rows: rows,

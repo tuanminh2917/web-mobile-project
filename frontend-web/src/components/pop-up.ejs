@@ -1,4 +1,24 @@
 <!-- Popup quảng cáo - hiện sau 1 phút -->
+<% if (typeof activeAd !== 'undefined' && activeAd) { %>
+<div id="adPopupOverlay" class="ad-popup-overlay" onclick="closeAdPopup(event)">
+  <div class="ad-popup-box">
+    <button class="ad-popup-close-btn" onclick="closeAdPopup(null, true)" id="adCloseBtn">✕</button>
+    <div class="ad-popup-badge">🔥 ƯU ĐÃI ĐẶC BIỆT</div>
+    <div class="ad-popup-img-wrap">
+      <img src="<%= activeAd.ImageURL %>"
+           alt="<%= activeAd.ProductTitle %>"
+           onclick="window.open('<%= activeAd.TargetLink %>', '_self');"
+           title="Xem chi tiết">
+    </div>
+    <div class="ad-popup-content">
+      <h2 class="ad-popup-title"><%= activeAd.ProductTitle %></h2>
+      <p class="ad-popup-desc">Đã có lịch chiếu mới cực HOT! Đặt vé ngay hôm nay để có chỗ ngồi đẹp nhất với giá cực ưu đãi!</p>
+      <a href="<%= activeAd.TargetLink %>" class="ad-popup-cta-btn">Đặt vé ngay</a>
+      <p class="ad-popup-note">* Áp dụng đặt vé online trên hệ thống Rạp chiếu phim quốc gia.</p>
+    </div>
+  </div>
+</div>
+<% } else { %>
 <div id="adPopupOverlay" class="ad-popup-overlay" onclick="closeAdPopup(event)">
   <div class="ad-popup-box">
     <button class="ad-popup-close-btn" onclick="closeAdPopup(null, true)" id="adCloseBtn">✕</button>
@@ -21,3 +41,4 @@
     </div>
   </div>
 </div>
+<% } %>

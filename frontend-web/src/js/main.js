@@ -1,14 +1,83 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Date tabs
+  // Date tabs filtering
   const dateTabs = document.querySelectorAll('.date-tab');
   dateTabs.forEach(tab => {
     tab.addEventListener('click', function() {
       dateTabs.forEach(t => t.classList.remove('active'));
       this.classList.add('active');
+      
+      // Apply filters depending on the page
+      applyMovieDetailFilters();
+      applyShowtimeFilters();
     });
   });
 
-  // Showtime buttons
+  // Showtime filtering function for Movie Detail Page
+  function applyMovieDetailFilters() {
+    const activeTab = document.querySelector('.date-tab.active');
+    if (!activeTab) return;
+    const selectedDate = activeTab.dataset.date;
+    if (!selectedDate) return;
+
+    const roomEls = document.querySelectorAll('.room-showtimes');
+    let anyVisible = false;
+    roomEls.forEach(roomEl => {
+      let visibleCount = 0;
+      const btns = roomEl.querySelectorAll('.showtime-btn');
+      btns.forEach(btn => {
+        if (btn.dataset.date === selectedDate) {
+          btn.style.display = 'flex';
+          visibleCount++;
+        } else {
+          btn.style.display = 'none';
+        }
+      });
+      if (visibleCount > 0) {
+        roomEl.style.display = 'block';
+        anyVisible = true;
+      } else {
+        roomEl.style.display = 'none';
+      }
+    });
+    // If no showtimes visible for the selected date, show everything
+    if (!anyVisible) {
+      document.querySelectorAll('.showtime-btn').forEach(btn => btn.style.display = 'flex');
+      document.querySelectorAll('.room-showtimes').forEach(r => r.style.display = 'block');
+    }
+  }
+
+  // Showtime filtering function for General Showtime Page
+  function applyShowtimeFilters() {
+    const activeTab = document.querySelector('.date-tab.active');
+    if (!activeTab) return;
+    const selectedDate = activeTab.dataset.date;
+    
+    const movieFilter = document.getElementById('movieFilter');
+    const selectedMovie = movieFilter ? movieFilter.value : '';
+
+    document.querySelectorAll('.screening-card').forEach(card => {
+      const dateMatch = !selectedDate || card.dataset.date === selectedDate;
+      const movieMatch = !selectedMovie || card.dataset.movie === selectedMovie;
+      
+      if (dateMatch && movieMatch) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // Run filters once on load to filter by the default active date
+  applyMovieDetailFilters();
+  applyShowtimeFilters();
+
+  // Unified movie dropdown filter for Showtime Page
+  const movieFilter = document.getElementById('movieFilter');
+  if (movieFilter) {
+    movieFilter.addEventListener('change', applyShowtimeFilters);
+  }
+
+  // Showtime buttons selection UI state helper
   const showtimeBtns = document.querySelectorAll('.showtime-btn');
   showtimeBtns.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -45,10 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ===================== AD POPUP (trang chủ, hiện sau 1 phút) =====================
   const adOverlay = document.getElementById('adPopupOverlay');
-  if (adOverlay) {
+  if (adOverlay && !sessionStorage.getItem('adPopupShown')) {
     // Hiện sau 60 giây (1 phút)
     setTimeout(function() {
       adOverlay.classList.add('active');
+      sessionStorage.setItem('adPopupShown', 'true');
     }, 60000);
   }
 

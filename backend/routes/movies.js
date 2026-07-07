@@ -13,7 +13,8 @@ router.get('/movies', async (req, res) => {
   res.render('main-page', {
     currentPage: 'movies',
     nowShowing: movies.filter(m => m.Status === 'On Going'),
-    comingSoon: movies.filter(m => m.Status === 'Up Coming')
+    comingSoon: movies.filter(m => m.Status === 'Up Coming'),
+    activeAd: null
   });
 });
 

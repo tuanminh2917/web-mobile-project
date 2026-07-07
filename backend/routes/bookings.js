@@ -182,7 +182,7 @@ router.get('/checkout/:id', async (req, res) => {
 
     const seats = tickets.map(t => {
       const rawType = seatTypeMap[`${t.Row}-${t.Number}`] || 'Regular';
-      const type = rawType === 'VIP' ? 'vip' : rawType === 'Couple' ? 'couple' : 'regular';
+      const type = rawType === 'VIP' ? 'vip' : (rawType === 'Couple Seat' || rawType === 'Couple') ? 'couple' : 'regular';
       return { row: t.Row, number: t.Number, price: parseFloat(t.Price), type };
     });
     const total = seats.reduce((sum, s) => sum + s.price, 0);

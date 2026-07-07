@@ -7,7 +7,8 @@ const pool = mysql.createPool({
   database: 'cinema_management',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  charset: 'utf8mb4'
 });
 
 const promisePool = pool.promise();
