@@ -1,9 +1,44 @@
-<div id="myModal" class="modal-overlay">
-    <div class="modal-content">
-        <!-- Hình ảnh minh họa -->
-        <!-- Chuyển trang (tab mới) nếu click vào ảnh-->
-        <img src="https://via.placeholder.com/150" alt="Hình ảnh minh họa" style="margin-top: 15px; border-radius: 5px;", onclick="window.open('https://www.example.com', '_blank');">
-        
-        <button class="close-btn" onclick="toggleModal(false)">✖ Đóng</button>
+<!-- Popup quảng cáo - hiện sau 1 phút -->
+<% if (typeof activeAd !== 'undefined' && activeAd) { %>
+<div id="adPopupOverlay" class="ad-popup-overlay" onclick="closeAdPopup(event)">
+  <div class="ad-popup-box">
+    <button class="ad-popup-close-btn" onclick="closeAdPopup(null, true)" id="adCloseBtn">✕</button>
+    <div class="ad-popup-badge">🔥 ƯU ĐÃI ĐẶC BIỆT</div>
+    <div class="ad-popup-img-wrap">
+      <img src="<%= activeAd.ImageURL %>"
+           alt="<%= activeAd.ProductTitle %>"
+           onclick="window.open('<%= activeAd.TargetLink %>', '_self');"
+           title="Xem chi tiết">
     </div>
+    <div class="ad-popup-content">
+      <h2 class="ad-popup-title"><%= activeAd.ProductTitle %></h2>
+      <p class="ad-popup-desc">Đã có lịch chiếu mới cực HOT! Đặt vé ngay hôm nay để có chỗ ngồi đẹp nhất với giá cực ưu đãi!</p>
+      <a href="<%= activeAd.TargetLink %>" class="ad-popup-cta-btn">Đặt vé ngay</a>
+      <p class="ad-popup-note">* Áp dụng đặt vé online trên hệ thống Rạp chiếu phim quốc gia.</p>
+    </div>
+  </div>
 </div>
+<% } else { %>
+<div id="adPopupOverlay" class="ad-popup-overlay" onclick="closeAdPopup(event)">
+  <div class="ad-popup-box">
+    <button class="ad-popup-close-btn" onclick="closeAdPopup(null, true)" id="adCloseBtn">✕</button>
+    <div class="ad-popup-badge">🔥 ƯU ĐÃI ĐẶC BIỆT</div>
+    <div class="ad-popup-img-wrap">
+      <img src="https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg"
+           alt="Avengers: Endgame"
+           onclick="window.open('https://www.themoviedb.org/movie/299534', '_blank');"
+           title="Xem thêm về phim này">
+    </div>
+    <div class="ad-popup-content">
+      <h2 class="ad-popup-title">Avengers: Endgame</h2>
+      <p class="ad-popup-desc">Mua vé hôm nay – giảm ngay <strong>30%</strong> cho suất chiếu cuối tuần!<br>Số lượng ghế có hạn, đừng bỏ lỡ!</p>
+      <div class="ad-popup-price">
+        <span class="ad-price-old">150.000đ</span>
+        <span class="ad-price-new">105.000đ</span>
+      </div>
+      <a href="/movies" class="ad-popup-cta-btn">Đặt vé ngay</a>
+      <p class="ad-popup-note">* Áp dụng cho vé thường T7, CN. Không áp dụng cùng ưu đãi khác.</p>
+    </div>
+  </div>
+</div>
+<% } %>

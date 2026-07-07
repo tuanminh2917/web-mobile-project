@@ -4,22 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chọn ghế - Cinema</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <link rel="stylesheet" href="../assets/seat-selection.css">
-  <link rel="stylesheet" href="../assets/responsive.css">
-  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/seat-selection.css">
+  <link rel="stylesheet" href="/assets/responsive.css">
+  <link rel="stylesheet" href="/assets/common.css">
 </head>
 <body>
   <%- include('../components/header', { currentPage: 'booking' }) %>
 
   <main>
     <div class="seat-page">
+      <!-- Breadcrumb -->
+      <div class="booking-steps">
+        <span class="step done">1. Chọn phim</span>
+        <span class="step-arrow">›</span>
+        <span class="step active">2. Chọn ghế</span>
+        <span class="step-arrow">›</span>
+        <span class="step">3. Thanh toán</span>
+      </div>
+
       <h1>Chọn ghế ngồi</h1>
       <p class="subtitle"><%= movie.Title %> &middot; <%= roomName %> &middot; <%= new Date(startTime).toLocaleString('vi-VN') %></p>
 
       <% if (typeof error !== 'undefined' && error) { %>
         <div class="alert alert-error" id="errorMsg">
-          <span><%= error %></span>
+          <span>⚠ <%= error %></span>
           <button type="button" onclick="document.getElementById('errorMsg').style.display='none'" class="btn-close">Đóng</button>
         </div>
       <% } %>
@@ -37,16 +46,20 @@
   </main>
 
   <%- include('../components/footer') %>
-  <script src="../js/seat-map.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/seat-map.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const occupiedSeats = <%= JSON.stringify(occupiedSeats || []) %>;
-      const seatTypes = <%= JSON.stringify(seatTypes || {}) %>;
+      const occupiedSeats = <%- JSON.stringify(occupiedSeats || []) %>;
+      const seatTypes = <%- JSON.stringify(seatTypes || {}) %>;
       const seatsPerRow = <%= seatsPerRow || 12 %>;
       const rows = <%= rows || 10 %>;
       const regularPrice = <%= regularPrice || 50000 %>;
       const vipPrice = <%= vipPrice || 65000 %>;
       const couplePrice = <%= couplePrice || 130000 %>;
+
+      console.log('[DEBUG] rows:', rows, 'seatsPerRow:', seatsPerRow, 'seatTypes keys:', Object.keys(seatTypes).length);
+      console.log('[DEBUG] SeatMap class available:', typeof SeatMap);
 
       const seatMap = new SeatMap('#seatMapContainer', {
         rows: rows,
@@ -65,10 +78,10 @@
       const form = document.getElementById('bookingForm');
 
       // Enable/disable confirm button based on selection
-      const observer = setInterval(() => {
+      setInterval(() => {
         if (seatMap.getSelectedSeats().length > 0) {
           confirmBtn.disabled = false;
-          confirmBtn.textContent = `Thanh toán - ${seatMap.getTotal().toLocaleString()}đ`;
+          confirmBtn.textContent = `Tiến hành thanh toán — ${seatMap.getTotal().toLocaleString()}đ`;
         } else {
           confirmBtn.disabled = true;
           confirmBtn.textContent = 'Tiến hành thanh toán';
@@ -77,7 +90,11 @@
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-        seatsInput.value = JSON.stringify(seatMap.getSelectedSeats());
+        const selected = seatMap.getSelectedSeats();
+        if (selected.length === 0) return;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Đang xử lý...';
+        seatsInput.value = JSON.stringify(selected);
         totalInput.value = seatMap.getTotal();
         this.submit();
       });

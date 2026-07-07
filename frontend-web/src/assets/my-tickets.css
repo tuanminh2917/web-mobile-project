@@ -50,6 +50,86 @@
 .ticket-card .ticket-right .status.canceled { background: rgba(231,26,15,0.2); color: var(--primary); }
 .ticket-card .ticket-right .seats { color: var(--accent); font-size: 14px; margin-top: 6px; }
 
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show {
+  display: flex;
+}
+.modal-content {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+  border: 1px solid var(--border-color);
+}
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 28px;
+  cursor: pointer;
+}
+.modal-close:hover {
+  color: var(--text-light);
+}
+.ticket-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.ticket-header img {
+  width: 70px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.ticket-header h2 {
+  color: var(--text-light);
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.ticket-header p {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.ticket-body {
+  border-top: 2px dashed var(--border-color);
+  padding-top: 20px;
+}
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.ticket-row span:last-child {
+  color: var(--text-light);
+  font-weight: 600;
+}
+.ticket-row.total {
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+  padding-top: 16px;
+  font-size: 16px;
+}
+.ticket-row.total span:last-child {
+  color: var(--accent);
+  font-size: 20px;
+}
+
 @media (max-width: 600px) {
   .ticket-card { flex-direction: column; }
   .ticket-card .ticket-left { flex: 0 0 auto; max-width: 80px; }

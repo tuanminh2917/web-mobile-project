@@ -172,12 +172,19 @@ router.get('/checkout/:id', async (req, res) => {
       [req.params.id]
     );
 
-    const seats = tickets.map(t => ({
-      row: t.Row,
-      number: t.Number,
-      price: parseFloat(t.Price),
-      type: 'regular'
-    }));
+    // Get seat types from Seat table
+    const [seatRows] = await db.query(
+      'SELECT Row, Number, SeatType FROM Seat WHERE RoomID = (SELECT RoomID FROM Screening WHERE ScreeningID = ?)',
+      [booking.ScreeningID]
+    );
+    const seatTypeMap = {};
+    seatRows.forEach(s => { seatTypeMap[`${s.Row}-${s.Number}`] = s.SeatType; });
+
+    const seats = tickets.map(t => {
+      const rawType = seatTypeMap[`${t.Row}-${t.Number}`] || 'Regular';
+      const type = rawType === 'VIP' ? 'vip' : (rawType === 'Couple Seat' || rawType === 'Couple') ? 'couple' : 'regular';
+      return { row: t.Row, number: t.Number, price: parseFloat(t.Price), type };
+    });
     const total = seats.reduce((sum, s) => sum + s.price, 0);
 
     res.render('checkout', {

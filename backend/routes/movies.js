@@ -13,7 +13,8 @@ router.get('/movies', async (req, res) => {
   res.render('main-page', {
     currentPage: 'movies',
     nowShowing: movies.filter(m => m.Status === 'On Going'),
-    comingSoon: movies.filter(m => m.Status === 'Up Coming')
+    comingSoon: movies.filter(m => m.Status === 'Up Coming'),
+    activeAd: null
   });
 });
 
@@ -23,13 +24,13 @@ router.get('/showtime', async (req, res) => {
   let screenings = [];
 
   try {
-    const [m] = await db.query("SELECT MovieID, Title FROM Movie WHERE Status IN ('On Going', 'Up Coming')");
+    const [m] = await db.query("SELECT MovieID, Title, Status FROM Movie WHERE Status IN ('On Going', 'Up Coming')");
     movies = m;
   } catch (err) { console.error('DB movies:', err.message); }
 
   try {
     const [s] = await db.query(`
-      SELECT s.*, m.Title AS MovieTitle, m.Genre, m.Duration, m.PosterURL, r.RoomName
+      SELECT s.*, m.Title AS MovieTitle, m.Genre, m.Duration, m.PosterURL, m.Status AS MovieStatus, r.RoomName
       FROM Screening s
       JOIN Movie m ON s.MovieID = m.MovieID
       JOIN Room r ON s.RoomID = r.RoomID

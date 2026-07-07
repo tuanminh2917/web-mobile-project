@@ -1,57 +1,140 @@
-/* Lớp nền mờ phủ toàn màn hình (Overlay) */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Màu đen trong suốt */
-    display: none; /* Ẩn mặc định */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+/* ===================== AD POPUP ===================== */
+.ad-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.ad-popup-overlay.active {
+  opacity: 1;
+  pointer-events: all;
 }
 
-/* Nội dung của Pop-up */
-.modal-content {
-    background-color: rgba(0, 0, 0, 0.285); /* Nền trong suốt */
-    color: white;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    text-align: center;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    width: fit-content;
-    max-width: calc(100% - 40px);
-    animation: fadeIn 0.3s ease-out;
+.ad-popup-box {
+  position: relative;
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  max-width: 420px;
+  width: calc(100% - 40px);
+  overflow: hidden;
+  animation: adPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,215,0,0.1);
 }
 
-.modal-content img {
-    max-width: 100%;
-    height: auto;
-    margin-top: 15px;
-    border-radius: 5px;
+@keyframes adPopIn {
+  from { transform: scale(0.7) translateY(40px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-/* Hiệu ứng hiện ra mượt mà */
-@keyframes fadeIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+.ad-popup-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s;
+}
+.ad-popup-close-btn:hover { background: rgba(220,53,69,0.7); }
+
+.ad-popup-badge {
+  background: linear-gradient(90deg, #e7200f, #ff6b35);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 7px 0;
 }
 
-/* Nút đóng bên trong Pop-up */
-.close-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.ad-popup-img-wrap {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.ad-popup-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  display: block;
+}
+.ad-popup-img-wrap:hover img { transform: scale(1.04); }
+
+.ad-popup-content {
+  padding: 20px 24px 24px;
+  text-align: center;
+}
+.ad-popup-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.ad-popup-desc {
+  color: #b0b8c8;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.ad-popup-desc strong { color: #ffd700; }
+
+.ad-popup-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.ad-price-old {
+  color: #888;
+  font-size: 15px;
+  text-decoration: line-through;
+}
+.ad-price-new {
+  color: #ffd700;
+  font-size: 24px;
+  font-weight: 700;
 }
 
-.close-btn:hover {
-    background-color: #a71d2a;
+.ad-popup-cta-btn {
+  display: inline-block;
+  background: linear-gradient(90deg, #e7200f, #ff6b35);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 13px 36px;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(231,32,15,0.4);
+  margin-bottom: 12px;
+}
+.ad-popup-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(231,32,15,0.6);
+}
+
+.ad-popup-note {
+  color: #666;
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.5;
 }

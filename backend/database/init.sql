@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS cinema_management;
-CREATE DATABASE cinema_management;
+CREATE DATABASE cinema_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE cinema_management;
 
 CREATE TABLE Movie (
@@ -122,11 +122,11 @@ INSERT INTO Room (RoomID, RoomName, RoomSize) VALUES
 (5, 'Phòng Nhỏ 05', 'Small');
 
 -- Movies
-INSERT INTO Movie (Title, Genre, Director, Actor, Languages, Censorship, Duration, ReleaseDate, Status, Description) VALUES
-('The Conjuring: Xác Ướp', 'Kinh dị', 'Michael Chaves', 'Patrick Wilson, Vera Farmiga', 'Phụ đề', 'T16', 120, '2026-04-17', 'On Going', 'Một bộ phim kinh dị về gia đình Warren đối mặt với thế lực siêu nhiên.'),
-('Lật Mặt 7', 'Tâm lý', 'Lý Hải', 'Quách Ngọc Tuyên, Trương Minh Cường', 'Tiếng Việt', 'K', 120, '2024-04-26', 'On Going', 'Một bộ phim về tình cảm gia đình đầy cảm xúc.'),
-('Avengers: Endgame', 'Hành động', 'Anthony Russo', 'Robert Downey Jr., Chris Evans', 'Phụ đề', 'T13', 181, '2019-04-26', 'Stoped', 'Trận chiến cuối cùng của các siêu anh hùng.'),
-('Dune: Part Two', 'Khoa học viễn tưởng', 'Denis Villeneuve', 'Timothée Chalamet, Zendaya', 'Phụ đề', 'T13', 166, '2026-06-15', 'Up Coming', 'Hành trình của Paul Atreides tại Arrakis.');
+INSERT INTO Movie (Title, Genre, Director, Actor, Languages, Censorship, Duration, ReleaseDate, Status, Description, PosterURL) VALUES
+('The Conjuring: Xác Ướp', 'Kinh dị', 'Michael Chaves', 'Patrick Wilson, Vera Farmiga', 'Phụ đề', 'T16', 120, '2026-04-17', 'On Going', 'Một bộ phim kinh dị về gia đình Warren đối mặt với thế lực siêu nhiên.', '/assets/conjuring-poster.jpg'),
+('Lật Mặt 7', 'Tâm lý', 'Lý Hải', 'Quách Ngọc Tuyên, Trương Minh Cường', 'Tiếng Việt', 'K', 120, '2024-04-26', 'On Going', 'Một bộ phim về tình cảm gia đình đầy cảm xúc.', '/assets/lat-mat-poster.jpg'),
+('Avengers: Endgame', 'Hành động', 'Anthony Russo', 'Robert Downey Jr., Chris Evans', 'Phụ đề', 'T13', 181, '2019-04-26', 'Stoped', 'Trận chiến cuối cùng của các siêu anh hùng.', '/assets/avengers-poster.jpg'),
+('Dune: Part Two', 'Khoa học viễn tưởng', 'Denis Villeneuve', 'Timothée Chalamet, Zendaya', 'Phụ đề', 'T13', 166, '2026-06-15', 'Up Coming', 'Hành trình của Paul Atreides tại Arrakis.', '/assets/dune-poster.jpg');
 
 -- Generate seats for Large rooms (1,2): 10 rows (A-J), 15 seats/row
 INSERT INTO Seat (RoomID, Row, Number, SeatType)
@@ -163,8 +163,8 @@ CROSS JOIN (SELECT 1 AS num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
 
 -- Users (passwords: admin123 / client123 - bcrypt hashed)
 INSERT INTO User (FullName, DateOfBirth, Email, Phone, Username, Password, Role) VALUES
-('Nguyễn Văn A', '1995-01-01', 'vana@gmail.com', '0912345678', 'admin01', '$2b$10$8K1p/a0dL1LXMIgoEDFrwOfMQkf9Rn6bm1FZwOJK3v0pMl0IRLG2y', 'Admin'),
-('Trần Thị B', '2000-05-15', 'thib@gmail.com', '0987654321', 'client01', '$2b$10$8K1p/a0dL1LXMIgoEDFrwOfMQkf9Rn6bm1FZwOJK3v0pMl0IRLG2y', 'Client');
+('Nguyễn Văn A', '1995-01-01', 'vana@gmail.com', '0912345678', 'admin01', '$2b$10$Urv0qIqJYR4JDnssfgub7ei7td4nzBZdC1nJUYRssBl7qs9N3Q/AK', 'Admin'),
+('Trần Thị B', '2000-05-15', 'thib@gmail.com', '0987654321', 'client01', '$2b$10$qfprUt8dTMFBbP29sMIoSuGL/QEJ4L.KmEp6XBcN0cB46Pm5PRqAq', 'Client');
 
 -- Screenings (today + next few days)
 INSERT INTO Screening (MovieID, RoomID, StartTime, EndTime, BasePrice) VALUES
@@ -180,3 +180,8 @@ INSERT INTO Screening (MovieID, RoomID, StartTime, EndTime, BasePrice) VALUES
 
 -- SystemStats
 INSERT INTO SystemStats (ViewCount) VALUES (0);
+
+-- Seeding advertisement
+INSERT INTO Advertisement (ProductTitle, ImageURL, TargetLink, IsActive) VALUES
+('Lật Mặt 7: Một Điều Ước', '/assets/lat-mat-7-banner.jpg', '/movies/2', TRUE);
+

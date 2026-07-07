@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vé của tôi - Cinema</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <link rel="stylesheet" href="../assets/my-tickets.css">
-  <link rel="stylesheet" href="../assets/responsive.css">
-  <link rel="stylesheet" href="../assets/common.css">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/my-tickets.css">
+  <link rel="stylesheet" href="/assets/responsive.css">
+  <link rel="stylesheet" href="/assets/common.css">
 </head>
 <body>
   <%- include('../components/header', { currentPage: 'my-tickets' }) %>
@@ -34,7 +34,7 @@
               <span class="status <%= b.Status.toLowerCase() %>"><%= b.Status === 'Paid' ? 'Đã thanh toán' : b.Status === 'Pending' ? 'Chờ thanh toán' : 'Đã hủy' %></span>
               <div class="seats"><%= b.TotalPrice.toLocaleString() %>đ</div>
               <% if (b.Status === 'Paid') { %>
-                <button class="btn btn-sm btn-secondary" style="margin-top:8px;" onclick="alert('Vé điện tử: #BK<%= b.BookingID %>')">Xem vé</button>
+                <button class="btn btn-sm btn-secondary" style="margin-top:8px;" onclick='openTicketModal(<%= JSON.stringify({BookingID: b.BookingID, MovieTitle: b.MovieTitle, PosterURL: b.PosterURL, RoomName: b.RoomName, StartTime: b.StartTime, Seats: b.Seats, TotalPrice: b.TotalPrice, Status: b.Status}) %>)'>Xem vé</button>
               <% } %>
               <% if (b.Status === 'Pending') { %>
                 <a href="/checkout/<%= b.BookingID %>" class="btn btn-sm btn-primary" style="margin-top:8px;display:inline-block;">Thanh toán</a>
@@ -52,6 +52,45 @@
   </main>
 
   <%- include('../components/footer') %>
-  <script src="../js/main.js"></script>
+
+  <!-- Ticket Modal -->
+  <div id="ticketModal" class="modal-overlay" onclick="closeTicketModal(event)">
+    <div class="modal-content ticket-modal">
+      <button class="modal-close" onclick="closeTicketModal()">&times;</button>
+      <div class="ticket-inner">
+        <div class="ticket-header">
+          <img id="modalPoster" src="" alt="">
+          <div>
+            <h2 id="modalTitle"></h2>
+            <p id="modalRoom"></p>
+          </div>
+        </div>
+        <div class="ticket-body">
+          <div class="ticket-row"><span>Mã vé</span><span id="modalCode"></span></div>
+          <div class="ticket-row"><span>Suất chiếu</span><span id="modalTime"></span></div>
+          <div class="ticket-row"><span>Ghế</span><span id="modalSeats"></span></div>
+          <div class="ticket-row total"><span>Tổng tiền</span><span id="modalTotal"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openTicketModal(ticket) {
+      document.getElementById('modalPoster').src = ticket.PosterURL || '/assets/poster-placeholder.jpg';
+      document.getElementById('modalTitle').textContent = ticket.MovieTitle;
+      document.getElementById('modalRoom').textContent = ticket.RoomName;
+      document.getElementById('modalCode').textContent = '#BK' + ticket.BookingID;
+      document.getElementById('modalTime').textContent = new Date(ticket.StartTime).toLocaleString('vi-VN');
+      document.getElementById('modalSeats').textContent = ticket.Seats;
+      document.getElementById('modalTotal').textContent = ticket.TotalPrice.toLocaleString() + 'đ';
+      document.getElementById('ticketModal').classList.add('show');
+    }
+    function closeTicketModal(event) {
+      if (!event || event.target === document.getElementById('ticketModal')) {
+        document.getElementById('ticketModal').classList.remove('show');
+      }
+    }
+  </script>
 </body>
 </html>
