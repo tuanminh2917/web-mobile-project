@@ -69,14 +69,16 @@ class SeatMap {
         const type = this.getSeatType(r, s, rowLabel, seatNum);
         const occupied = this.isOccupied(rowLabel, seatNum);
 
+        const isSmall = r >= this.options.rows - 2;
         const seat = document.createElement('div');
-        seat.className = `seat ${type}`;
+        seat.className = `seat ${type}${isSmall ? ' small' : ''}`;
         if (occupied) seat.classList.add('occupied');
         seat.dataset.row = rowLabel;
         seat.dataset.number = seatNum;
         seat.dataset.type = type;
         seat.dataset.price = this.priceMap[type] || this.priceMap.regular;
         seat.title = `${rowLabel}${seatNum} - ${this.getTypeLabel(type)}`;
+        seat.textContent = seatNum;
 
         row.appendChild(seat);
       }

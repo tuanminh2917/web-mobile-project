@@ -23,7 +23,7 @@
       <div class="carousel-wrapper">
         <% if (typeof banners !== 'undefined' && banners.length) { %>
           <% banners.forEach(banner => { %>
-            <div class="carousel-item"><img src="<%= banner.image %>" alt="<%= banner.title %>"></div>
+            <a href="/movies/<%= banner.movieId %>" class="carousel-item"><img src="<%= banner.image %>" alt="<%= banner.title %>"></a>
           <% }); %>
         <% } else { %>
           <div class="carousel-item"><img src="/assets/poster1.jpg" alt="Phim 1"></div>

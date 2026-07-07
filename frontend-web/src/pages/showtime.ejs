@@ -17,16 +17,10 @@
       <h1>Lịch chiếu phim</h1>
       <p class="subtitle">Chọn phim và suất chiếu phù hợp với bạn</p>
 
-      <div class="movie-selector">
-        <label style="color:var(--text-muted);font-size:14px;display:block;margin-bottom:6px;">Chọn phim</label>
-        <select name="movie" id="movieFilter">
-          <option value="">Tất cả phim</option>
-          <% if (typeof movies !== 'undefined') { %>
-            <% movies.forEach(m => { %>
-              <option value="<%= m.MovieID %>"><%= m.Title %></option>
-            <% }); %>
-          <% } %>
-        </select>
+      <div class="status-tabs">
+        <div class="status-tab active" data-status="">Tất cả</div>
+        <div class="status-tab" data-status="On Going">Đang chiếu</div>
+        <div class="status-tab" data-status="Up Coming">Sắp chiếu</div>
       </div>
 
       <div class="date-tabs">
@@ -56,7 +50,7 @@
               const dateVal = String(sDate.getDate()).padStart(2, '0');
               const dateStr = `${year}-${month}-${dateVal}`;
             %>
-            <div class="screening-card" data-movie="<%= s.MovieID %>" data-date="<%= dateStr %>">
+            <div class="screening-card" data-movie="<%= s.MovieID %>" data-date="<%= dateStr %>" data-status="<%= s.MovieStatus %>">
               <img src="<%= s.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= s.MovieTitle %>" class="movie-thumb">
               <div class="info">
                 <h3><%= s.MovieTitle %></h3>
@@ -130,17 +124,5 @@
 
   <%- include('../components/footer') %>
   <script src="/js/main.js"></script>
-  <script>
-    document.getElementById('movieFilter')?.addEventListener('change', function() {
-      const val = this.value;
-      document.querySelectorAll('.screening-card').forEach(card => {
-        if (!val || card.dataset.movie === val) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-  </script>
 </body>
 </html>

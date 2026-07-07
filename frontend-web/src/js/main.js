@@ -52,14 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!activeTab) return;
     const selectedDate = activeTab.dataset.date;
     
-    const movieFilter = document.getElementById('movieFilter');
-    const selectedMovie = movieFilter ? movieFilter.value : '';
+    const statusTab = document.querySelector('.status-tab.active');
+    const selectedStatus = statusTab ? statusTab.dataset.status : '';
 
     document.querySelectorAll('.screening-card').forEach(card => {
       const dateMatch = !selectedDate || card.dataset.date === selectedDate;
-      const movieMatch = !selectedMovie || card.dataset.movie === selectedMovie;
+      const statusMatch = !selectedStatus || card.dataset.status === selectedStatus;
       
-      if (dateMatch && movieMatch) {
+      if (dateMatch && statusMatch) {
         card.style.display = 'flex';
       } else {
         card.style.display = 'none';
@@ -71,11 +71,15 @@ document.addEventListener('DOMContentLoaded', function() {
   applyMovieDetailFilters();
   applyShowtimeFilters();
 
-  // Unified movie dropdown filter for Showtime Page
-  const movieFilter = document.getElementById('movieFilter');
-  if (movieFilter) {
-    movieFilter.addEventListener('change', applyShowtimeFilters);
-  }
+  // Status tab filter for Showtime Page
+  const statusTabs = document.querySelectorAll('.status-tab');
+  statusTabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      statusTabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      applyShowtimeFilters();
+    });
+  });
 
   // Showtime buttons selection UI state helper
   const showtimeBtns = document.querySelectorAll('.showtime-btn');

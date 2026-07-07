@@ -92,10 +92,17 @@ app.get('/', async (req, res) => {
     }
   } catch (err) { console.error('DB ad:', err.message); }
 
+  const banners = nowShowing.map(m => ({
+    image: m.PosterURL || '/assets/poster-placeholder.jpg',
+    title: m.Title,
+    movieId: m.MovieID
+  }));
+
   res.render('main-page', {
     currentPage: 'home',
     nowShowing,
     comingSoon,
+    banners,
     activeAd
   });
 });
