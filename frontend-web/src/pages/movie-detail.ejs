@@ -40,82 +40,54 @@
         </div>
 
         <div class="showtime-section">
-          <h3>Chọn suất chiếu</h3>
-          <div class="date-tabs">
-            <% if (typeof dates !== 'undefined') { %>
-              <% dates.forEach((date, i) => { %>
-                <div class="date-tab <%= i === 0 ? 'active' : '' %>" data-date="<%= date %>">
-                  <span class="day"><%= new Date(date).toLocaleDateString('vi-VN', { weekday: 'short' }) %></span>
-                  <span class="date-num"><%= new Date(date).getDate() %></span>
+          <% if (movie.Status === 'Up Coming') { %>
+            <div style="background:var(--bg-dark);padding:24px;border-radius:12px;text-align:center;border:1px dashed var(--border-color);">
+              <h3 style="margin-bottom:8px;color:var(--text-light);">Phim sắp ra mắt</h3>
+              <p style="color:var(--text-muted);font-size:16px;">
+                Dự kiến khởi chiếu từ ngày <strong><%= new Date(movie.ReleaseDate).toLocaleDateString('vi-VN') %></strong>
+              </p>
+            </div>
+          <% } else { %>
+            <h3>Chọn suất chiếu</h3>
+            <div class="date-tabs">
+              <% if (typeof dates !== 'undefined') { %>
+                <% dates.forEach((date, i) => { %>
+                  <div class="date-tab <%= i === 0 ? 'active' : '' %>" data-date="<%= date %>">
+                    <span class="day"><%= new Date(date).toLocaleDateString('vi-VN', { weekday: 'short' }) %></span>
+                    <span class="date-num"><%= new Date(date).getDate() %></span>
+                  </div>
+                <% }); %>
+              <% } else { %>
+                <div class="date-tab active"><span class="day">Hôm nay</span><span class="date-num">10</span></div>
+                <div class="date-tab"><span class="day">Mai</span><span class="date-num">11</span></div>
+                <div class="date-tab"><span class="day">T2</span><span class="date-num">12</span></div>
+              <% } %>
+            </div>
+
+            <% if (typeof screenings !== 'undefined' && Object.keys(screenings).length) { %>
+              <% Object.keys(screenings).forEach(room => { %>
+                <div class="room-showtimes">
+                  <h4><%= room %></h4>
+                  <div class="showtime-grid">
+                    <% screenings[room].forEach(s => { %>
+                      <% 
+                        const sDate = new Date(s.StartTime);
+                        const year = sDate.getFullYear();
+                        const month = String(sDate.getMonth() + 1).padStart(2, '0');
+                        const dateVal = String(sDate.getDate()).padStart(2, '0');
+                        const dateStr = `${year}-${month}-${dateVal}`;
+                      %>
+                      <a href="/book/<%= s.ScreeningID %>" class="showtime-btn" data-date="<%= dateStr %>">
+                        <span class="time"><%= new Date(s.StartTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %></span>
+                        <span class="price"><%= s.BasePrice.toLocaleString() %>đ</span>
+                      </a>
+                    <% }); %>
+                  </div>
                 </div>
               <% }); %>
             <% } else { %>
-              <div class="date-tab active"><span class="day">Hôm nay</span><span class="date-num">10</span></div>
-              <div class="date-tab"><span class="day">Mai</span><span class="date-num">11</span></div>
-              <div class="date-tab"><span class="day">T2</span><span class="date-num">12</span></div>
+              <p style="color:var(--text-muted)">Chưa có suất chiếu nào cho phim này.</p>
             <% } %>
-          </div>
-
-          <% if (typeof screenings !== 'undefined' && screenings.length) { %>
-            <% Object.keys(screenings).forEach(room => { %>
-              <div class="room-showtimes">
-                <h4><%= room %></h4>
-                <div class="showtime-grid">
-                  <% screenings[room].forEach(s => { %>
-                    <% 
-                      const sDate = new Date(s.StartTime);
-                      const year = sDate.getFullYear();
-                      const month = String(sDate.getMonth() + 1).padStart(2, '0');
-                      const dateVal = String(sDate.getDate()).padStart(2, '0');
-                      const dateStr = `${year}-${month}-${dateVal}`;
-                    %>
-                    <a href="/book/<%= s.ScreeningID %>" class="showtime-btn" data-date="<%= dateStr %>">
-                      <span class="time"><%= new Date(s.StartTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %></span>
-                      <span class="price"><%= s.BasePrice.toLocaleString() %>đ</span>
-                    </a>
-                  <% }); %>
-                </div>
-              </div>
-            <% }); %>
-          <% } else { %>
-            <div class="room-showtimes">
-              <h4>Phòng 1 (Phòng lớn)</h4>
-              <div class="showtime-grid">
-                <a href="/book/1" class="showtime-btn">
-                  <span class="time">09:00</span>
-                  <span class="price">50,000đ</span>
-                </a>
-                <a href="/book/2" class="showtime-btn">
-                  <span class="time">14:30</span>
-                  <span class="price">60,000đ</span>
-                </a>
-                <a href="/book/3" class="showtime-btn">
-                  <span class="time">19:00</span>
-                  <span class="price">80,000đ</span>
-                </a>
-                <a href="/book/4" class="showtime-btn">
-                  <span class="time">22:00</span>
-                  <span class="price">100,000đ</span>
-                </a>
-              </div>
-            </div>
-            <div class="room-showtimes">
-              <h4>Phòng 3 (Phòng nhỏ)</h4>
-              <div class="showtime-grid">
-                <a href="/book/5" class="showtime-btn">
-                  <span class="time">10:30</span>
-                  <span class="price">50,000đ</span>
-                </a>
-                <a href="/book/6" class="showtime-btn">
-                  <span class="time">15:00</span>
-                  <span class="price">60,000đ</span>
-                </a>
-                <a href="/book/7" class="showtime-btn">
-                  <span class="time">19:30</span>
-                  <span class="price">90,000đ</span>
-                </a>
-              </div>
-            </div>
           <% } %>
         </div>
       </div>

@@ -12,3 +12,4 @@ backend/database/db.js
 fix*.js
 test*.js
 backend/sessions/
+app/

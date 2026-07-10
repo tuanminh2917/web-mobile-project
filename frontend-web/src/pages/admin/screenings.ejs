@@ -32,6 +32,16 @@
         <button class="btn btn-primary" onclick="document.getElementById('addModal').style.display='block'">+ Thêm suất chiếu</button>
       </div>
 
+      <% if (typeof adminError !== 'undefined' && adminError) { %>
+        <div style="background:#7f1d1d;color:#fca5a5;padding:12px 16px;border-radius:8px;margin-bottom:16px;border:1px solid #ef4444;">
+          <%= adminError %>
+        </div>
+      <% } %>
+      <% if (typeof adminSuccess !== 'undefined' && adminSuccess) { %>
+        <div style="background:#14532d;color:#86efac;padding:12px 16px;border-radius:8px;margin-bottom:16px;border:1px solid #22c55e;">
+          <%= adminSuccess %>
+        </div>
+      <% } %>
       <table class="admin-table">
         <thead>
           <tr>
@@ -88,16 +98,24 @@
           <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Phòng chiếu</label>
           <select name="roomID" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
             <option value="">Chọn phòng</option>
-            <option value="1">Phòng Lớn 01</option>
-            <option value="2">Phòng Lớn 02</option>
-            <option value="3">Phòng Nhỏ 03</option>
-            <option value="4">Phòng Nhỏ 04</option>
-            <option value="5">Phòng Nhỏ 05</option>
+            <% if (typeof rooms !== 'undefined') { %>
+              <% rooms.forEach(r => { %>
+                <option value="<%= r.RoomID %>"><%= r.RoomName %></option>
+              <% }); %>
+            <% } else { %>
+              <option value="1">Phòng Lớn 01</option>
+              <option value="2">Phòng Lớn 02</option>
+              <option value="3">Phòng Nhỏ 03</option>
+              <option value="4">Phòng Nhỏ 04</option>
+              <option value="5">Phòng Nhỏ 05</option>
+            <% } %>
           </select>
         </div>
         <div style="margin-bottom:16px;">
           <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Giờ bắt đầu</label>
-          <input type="datetime-local" name="startTime" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+          <input type="datetime-local" name="startTime" 
+            style="width:100%;padding:10px;background:#1e293b;border:1px solid var(--border-color);border-radius:6px;color:#fff;color-scheme:dark;" 
+            required>
         </div>
         <div style="margin-bottom:16px;">
           <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Giá cơ bản</label>
@@ -113,5 +131,24 @@
 
   <%- include('../../components/footer') %>
   <script src="../../js/main.js"></script>
+  <script>
+    // Tự điền giá trị mặc định cho datetime khi mở modal (tránh lỗi AM/PM trống)
+    function openAddModal() {
+      const modal = document.getElementById('addModal');
+      modal.style.display = 'block';
+
+      // Tạo ngày mai 09:00 làm mặc định
+      const now = new Date();
+      now.setDate(now.getDate() + 1);
+      now.setHours(9, 0, 0, 0);
+
+      // Format: YYYY-MM-DDTHH:mm (chuẩn của datetime-local)
+      const pad = n => String(n).padStart(2, '0');
+      const val = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      
+      const dtInput = document.getElementById('startTimeInput');
+      if (dtInput && !dtInput.value) dtInput.value = val;
+    }
+  </script>
 </body>
 </html>

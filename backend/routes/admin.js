@@ -133,7 +133,12 @@ router.get('/admin/screenings', requireAdmin, async (req, res) => {
       ORDER BY s.StartTime DESC
     `);
     const [movies] = await db.query("SELECT MovieID, Title FROM Movie WHERE Status != 'Stoped'");
-    res.render('admin/screenings', { currentPage: 'admin', screenings, movies });
+    const [rooms] = await db.query('SELECT RoomID, RoomName FROM Room ORDER BY RoomID');
+    const adminError = req.session.adminError || null;
+    const adminSuccess = req.session.adminSuccess || null;
+    req.session.adminError = null;
+    req.session.adminSuccess = null;
+    res.render('admin/screenings', { currentPage: 'admin', screenings, movies, rooms, adminError, adminSuccess });
   } catch (err) {
     console.error(err);
     res.status(500).send('Lỗi server');
@@ -148,19 +153,40 @@ router.post('/admin/screenings', requireAdmin, async (req, res) => {
     const [movies] = await db.query('SELECT Duration FROM Movie WHERE MovieID = ?', [movieID]);
     const duration = movies[0]?.Duration || 120;
 
-    // Calculate end time (duration + 15min cleanup)
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + (duration + 15) * 60000);
+    // Tính EndTime bằng MySQL để tránh lỗi timezone của JS
+    // startTime từ form là "YYYY-MM-DDTHH:mm", MySQL dùng DATE_ADD tính đúng local time
+    const totalMinutes = duration + 15;
+
+    // Lấy EndTime bằng cách tính trong MySQL để đúng timezone
+    const [[{ endTime }]] = await db.query(
+      `SELECT DATE_ADD(?, INTERVAL ? MINUTE) AS endTime`,
+      [startTime, totalMinutes]
+    );
+
+    // Kiểm tra xung đột: cùng phòng, giờ chồng nhau
+    const [conflicts] = await db.query(`
+      SELECT ScreeningID FROM Screening
+      WHERE RoomID = ?
+        AND StartTime < ?
+        AND EndTime > ?
+    `, [roomID, endTime, startTime]);
+
+    if (conflicts.length > 0) {
+      req.session.adminError = `❌ Phòng này đã có suất chiếu trùng giờ. Vui lòng chọn giờ hoặc phòng khác.`;
+      return req.session.save(() => res.redirect('/admin/screenings'));
+    }
 
     await db.query(
       'INSERT INTO Screening (MovieID, RoomID, StartTime, EndTime, BasePrice) VALUES (?, ?, ?, ?, ?)',
-      [movieID, roomID, startTime, end.toISOString().slice(0, 19).replace('T', ' '), parseFloat(basePrice)]
+      [movieID, roomID, startTime, endTime, parseFloat(basePrice)]
     );
 
-    res.redirect('/admin/screenings');
+    req.session.adminSuccess = '✅ Thêm suất chiếu thành công!';
+    req.session.save(() => res.redirect('/admin/screenings'));
   } catch (err) {
-    console.error(err);
-    res.redirect('/admin/screenings');
+    console.error('Screening add error:', err);
+    req.session.adminError = '❌ Lỗi server: ' + err.message;
+    req.session.save(() => res.redirect('/admin/screenings'));
   }
 });
 

@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/theme';
 import { Tabs } from 'expo-router';
 import { StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AppTabs() {
   return (
@@ -19,22 +20,42 @@ export default function AppTabs() {
     >
       <Tabs.Screen
         name="main-page"
-        options={{ title: 'Main' }}
+        options={{
+          title: 'Main',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} color={color} size={size} />
+          )
+        }}
       />
 
       <Tabs.Screen
         name="schedule"
-        options={{ title: 'Schedule' }}
+        options={{
+          title: 'Schedule',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={color} size={size} />
+          )
+        }}
       />
 
       <Tabs.Screen
         name="contact"
-        options={{ title: 'Contact' }}
+        options={{
+          title: 'Contact',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'chatbubbles' : 'chatbubbles-outline'} color={color} size={size} />
+          )
+        }}
       />
 
       <Tabs.Screen
         name="account"
-        options={{ title: 'Account' }}
+        options={{
+          title: 'Account',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'person' : 'person-outline'} color={color} size={size} />
+          )
+        }}
       />
     </Tabs>
   );
