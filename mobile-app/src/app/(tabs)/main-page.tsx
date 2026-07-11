@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { Movie } from '@/types';
-import { api } from '@/services/api';
+import { api, getFullImageUrl } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -33,7 +33,7 @@ function MovieVerticalCard({ movie }: { movie: Movie }) {
     >
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: movie.PosterURL }}
+          source={{ uri: getFullImageUrl(movie.PosterURL) }}
           style={styles.movieImage}
           contentFit="cover"
           placeholder={{ thumbhash: undefined }}

@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Booking, User } from '@/types';
-import { api, formatDateTime, formatPrice } from '@/services/api';
+import { api, formatDateTime, formatPrice, getFullImageUrl } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
 const AUTH_KEY = '@cinema_user';
@@ -269,7 +269,7 @@ function TicketCard({ booking }: { booking: Booking }) {
       <View style={styles.ticketHeader}>
         <View style={styles.ticketPosterWrap}>
           <Image
-            source={{ uri: booking.PosterURL }}
+            source={{ uri: getFullImageUrl(booking.PosterURL) }}
             style={styles.ticketPoster}
             contentFit="cover"
           />

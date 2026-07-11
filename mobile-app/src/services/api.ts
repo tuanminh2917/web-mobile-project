@@ -336,6 +336,13 @@ export function formatPrice(price: number): string {
   return price.toLocaleString('vi-VN') + 'đ';
 }
 
+// Helper: Fix URL ảnh bị thiếu host (ví dụ /assets/movie1.jpg -> http://10.0.2.2:3000/assets/movie1.jpg)
+export function getFullImageUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('/')) return `${BASE_URL}${url}`;
+  return url;
+}
+
 // Helper: format ngày giờ VN (cố định múi giờ VN để tránh sai ngày trên emulator)
 export function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString('vi-VN', {

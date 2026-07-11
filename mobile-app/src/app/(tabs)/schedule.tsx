@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { Screening } from '@/types';
-import { api, formatTime, formatPrice, formatDateShort } from '@/services/api';
+import { api, formatTime, formatPrice, formatDateShort, getFullImageUrl } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
 // =============================================
@@ -51,7 +51,7 @@ export default function ScheduleScreen() {
       {/* Poster */}
       <View style={styles.posterContainer}>
         <Image
-          source={{ uri: item.PosterURL }}
+          source={{ uri: getFullImageUrl(item.PosterURL) }}
           style={styles.poster}
           contentFit="cover"
           transition={300}

@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Movie, ScreeningByRoom, Comment, User } from '@/types';
-import { api, formatDateShort, formatTime, formatPrice, getVNDateString } from '@/services/api';
+import { api, formatDateShort, formatTime, formatPrice, getVNDateString, getFullImageUrl } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
 export default function MovieDetailScreen() {
@@ -142,7 +142,7 @@ export default function MovieDetailScreen() {
         {/* --- MOVIE INFO --- */}
         <View style={styles.infoSection}>
           <Image
-            source={{ uri: movie.PosterURL }}
+            source={{ uri: getFullImageUrl(movie.PosterURL) }}
             style={styles.poster}
             contentFit="cover"
           />
