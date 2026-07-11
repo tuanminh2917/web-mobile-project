@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { Screening } from '@/types';
-import { api, formatTime, formatPrice } from '@/services/api';
+import { api, formatTime, formatPrice, formatDateShort } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
 // =============================================
@@ -66,7 +66,7 @@ export default function ScheduleScreen() {
 
         <View style={styles.timePriceRow}>
           <View style={styles.timeBadge}>
-            <Text style={styles.timeText}>{formatTime(item.StartTime)}</Text>
+            <Text style={styles.timeText}>{formatTime(item.StartTime)} - {formatDateShort(item.StartTime)}</Text>
           </View>
           <Text style={styles.priceText}>{formatPrice(item.BasePrice)}</Text>
         </View>

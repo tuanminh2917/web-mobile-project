@@ -41,12 +41,16 @@ router.get('/showtime', async (req, res) => {
     screenings = s;
   } catch (err) { console.error('DB screenings:', err.message); }
 
-  const dates = [];
-  for (let i = 0; i < 5; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    dates.push(d.toISOString().split('T')[0]);
-  }
+  const allDates = new Set();
+  screenings.forEach(scr => {
+    const d = new Date(scr.StartTime);
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).formatToParts(d);
+    const year = parts.find(p => p.type === 'year').value;
+    const month = parts.find(p => p.type === 'month').value;
+    const day = parts.find(p => p.type === 'day').value;
+    allDates.add(`${year}-${month}-${day}`);
+  });
+  const dates = Array.from(allDates).sort();
 
   res.render('showtime', {
     currentPage: 'showtime',
@@ -81,13 +85,17 @@ router.get('/movies/:id', async (req, res) => {
       screeningByRoom[key].push(s);
     });
 
-    // Get dates
-    const dates = [];
-    for (let i = 0; i < 5; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      dates.push(d.toISOString().split('T')[0]);
-    }
+    // Get dates dynamically from screenings
+    const allDates = new Set();
+    screenings.forEach(scr => {
+      const d = new Date(scr.StartTime);
+      const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).formatToParts(d);
+      const year = parts.find(p => p.type === 'year').value;
+      const month = parts.find(p => p.type === 'month').value;
+      const day = parts.find(p => p.type === 'day').value;
+      allDates.add(`${year}-${month}-${day}`);
+    });
+    const dates = Array.from(allDates).sort();
 
     // Get comments
     const [comments] = await db.query(`
