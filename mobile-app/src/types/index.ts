@@ -87,7 +87,7 @@ export interface User {
   Username: string;
   FullName?: string;
   Email?: string;
-  Role: 'User' | 'Admin';
+  Role: 'User' | 'Admin' | 'Client';
   token: string;
 }
 

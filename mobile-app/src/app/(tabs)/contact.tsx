@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, Alert, Activi
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
+import { api } from '@/services/api';
 
 export default function ContactScreen() {
   const [name, setName] = useState('');
@@ -11,7 +12,7 @@ export default function ContactScreen() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!name.trim() || !email.trim() || !subject.trim() || !message.trim()) {
       Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin!');
       return;
@@ -23,14 +24,18 @@ export default function ContactScreen() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert('Thành công', 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi qua email sớm nhất.');
+    const result = await api.submitContact(name, email, subject, message);
+    setLoading(false);
+    
+    if (result.success) {
+      Alert.alert('Thành công', result.message || 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi qua email sớm nhất.');
       setName('');
       setEmail('');
       setSubject('');
       setMessage('');
-    }, 1500);
+    } else {
+      Alert.alert('Lỗi', result.message || 'Có lỗi xảy ra khi gửi tin nhắn.');
+    }
   };
 
   return (

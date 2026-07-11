@@ -53,6 +53,10 @@ const movieRoutes = require('./routes/movies');
 const bookingRoutes = require('./routes/bookings');
 const adminRoutes = require('./routes/admin');
 const contactRoutes = require('./routes/contact');
+const apiRoutes = require('./routes/api');
+
+// Mount JSON API cho mobile app
+app.use('/api', apiRoutes);
 
 app.use(authRoutes);
 app.use(movieRoutes);

@@ -39,10 +39,21 @@ document.addEventListener('DOMContentLoaded', function() {
         roomEl.style.display = 'none';
       }
     });
-    // If no showtimes visible for the selected date, show everything
+    // Show/hide message based on visibility
+    let msgEl = document.getElementById('no-screenings-msg');
+    if (!msgEl) {
+      msgEl = document.createElement('p');
+      msgEl.id = 'no-screenings-msg';
+      msgEl.style.color = 'var(--text-muted)';
+      msgEl.innerText = 'Chưa có suất chiếu nào cho ngày này.';
+      const section = document.querySelector('.showtime-section');
+      if (section) section.appendChild(msgEl);
+    }
+    
     if (!anyVisible) {
-      document.querySelectorAll('.showtime-btn').forEach(btn => btn.style.display = 'flex');
-      document.querySelectorAll('.room-showtimes').forEach(r => r.style.display = 'block');
+      msgEl.style.display = 'block';
+    } else {
+      msgEl.style.display = 'none';
     }
   }
 

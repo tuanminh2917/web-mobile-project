@@ -53,8 +53,14 @@ export default function AccountScreen() {
   }, []);
 
   const loadBookings = async (token: string) => {
-    const data = await api.getMyBookings(token);
-    setBookings(data);
+    try {
+      const data = await api.getMyBookings(token);
+      // Đảm bảo data luôn là array, tránh crash khi API trả lỗi
+      setBookings(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Load bookings error:', e);
+      setBookings([]);
+    }
   };
 
   // Đăng nhập

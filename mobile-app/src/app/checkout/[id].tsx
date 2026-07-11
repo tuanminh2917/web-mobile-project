@@ -65,7 +65,9 @@ export default function CheckoutScreen() {
   const handleConfirmPay = async () => {
     if (!user) return;
     setIsProcessing(true);
-    const result = await api.confirmBooking(Number(id), selectedSeats, user.token);
+    // Tự tạo token từ UserID nếu user.token không có (dữ liệu cũ trong AsyncStorage)
+    const token = user.token || `dummy-token-${user.UserID}`;
+    const result = await api.confirmBooking(Number(id), selectedSeats, token);
     setIsProcessing(false);
     
     if (result.success) {

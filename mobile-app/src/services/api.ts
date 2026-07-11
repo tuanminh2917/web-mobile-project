@@ -15,8 +15,8 @@ import {
   SeatMapConfig,
 } from '@/types';
 
-// Đổi thành URL thực khi có backend
-const BASE_URL = 'http://localhost:3001';
+// Đổi thành URL thực tế của backend trên máy ảo Android (10.0.2.2 trỏ về localhost của máy tính)
+const BASE_URL = 'http://10.0.2.2:3000';
 
 // =============================================
 // MOCK DATA — giống fallback data của web
@@ -148,20 +148,12 @@ const MOCK_SCREENINGS: Screening[] = [
   },
 ];
 
-const MOCK_COMMENTS: Record<number, Comment[]> = {};
+// (Đã xóa Mock Data thừa)
 
-const MOCK_OCCUPIED_SEATS: Record<number, OccupiedSeat[]> = {
-  1: [
-    { row: 'A', number: 1 }, { row: 'A', number: 2 },
-    { row: 'B', number: 5 }, { row: 'B', number: 6 }
-  ],
-  2: [
-    { row: 'C', number: 3 }, { row: 'D', number: 8 },
-    { row: 'E', number: 7 }, { row: 'F', number: 11 }
-  ]
-};
-
-let MOCK_BOOKINGS: Booking[] = [];
+// Helper: lấy token từ user object, fallback tự tạo từ UserID nếu không có
+function getToken(user: { token?: string; UserID: number }): string {
+  return user.token || `dummy-token-${user.UserID}`;
+}
 
 // =============================================
 // API FUNCTIONS — pattern từ slide Networking
@@ -233,69 +225,71 @@ export const api = {
 
   // --- SEAT MAP ---
   getSeatMap: async (screeningId: number): Promise<SeatMapConfig> => {
-    return fetchWithFallback(`${BASE_URL}/api/screenings/${screeningId}/seats`, {
-      rows: 10,
-      seatsPerRow: 12,
-      occupiedSeats: MOCK_OCCUPIED_SEATS[screeningId] || [],
-      seatTypes: {},
-      regularPrice: 80000,
-      vipPrice: 100000,
-      couplePrice: 200000,
-      maxSelectable: 8,
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/api/screenings/${screeningId}/seats`);
+      return await res.json();
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   },
 
   // --- COMMENTS ---
   getComments: async (movieId: number): Promise<Comment[]> => {
-    return fetchWithFallback(
-      `${BASE_URL}/api/movies/${movieId}/comments`,
-      MOCK_COMMENTS[movieId] ?? [],
-    );
+    try {
+      const res = await fetch(`${BASE_URL}/api/movies/${movieId}/comments`);
+      return await res.json();
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   },
 
-  submitComment: async (movieId: number, rating: number, content: string, user: User): Promise<{success: boolean; comment: Comment}> => {
-    const newComment: Comment = {
-      CommentID: Math.floor(Math.random() * 900000),
-      MovieID: movieId,
-      Username: user.Username,
-      FullName: user.FullName,
-      Rating: rating,
-      Content: content,
-      CreatedAt: new Date().toISOString()
-    };
-    
-    if (!MOCK_COMMENTS[movieId]) MOCK_COMMENTS[movieId] = [];
-    MOCK_COMMENTS[movieId].unshift(newComment);
-    
-    return { success: true, comment: newComment };
+  submitComment: async (movieId: number, rating: number, content: string, user: User): Promise<{success: boolean; comment?: Comment}> => {
+    try {
+      const token = getToken(user);
+      const res = await fetch(`${BASE_URL}/api/movies/${movieId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: token },
+        body: JSON.stringify({ content, rating }),
+      });
+      return await res.json();
+    } catch (e) {
+      console.error(e);
+      return { success: false };
+    }
+  },
+
+  // --- CONTACT ---
+  submitContact: async (senderName: string, senderEmail: string, subject: string, message: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senderName, senderEmail, subject, message }),
+      });
+      return await res.json();
+    } catch (e) {
+      console.error('Lỗi khi gửi form liên hệ:', e);
+      return { success: false, message: 'Không thể kết nối đến server.' };
+    }
   },
 
   // --- AUTH (POST, dùng pattern từ slide) ---
-  register: async (username: string, password: string, fullName: string, email: string): Promise<{ success: boolean; token?: string; user?: User }> => {
+  register: async (username: string, password: string, fullName: string, email: string): Promise<{ success: boolean; token?: string; user?: User; error?: string }> => {
     try {
       const res = await fetch(`${BASE_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, fullName, email }),
+        body: JSON.stringify({ username, password, fullname: fullName, email }),
       });
       return await res.json();
-    } catch {
-      return {
-        success: true,
-        token: 'mock-jwt-token-new',
-        user: {
-          UserID: Math.floor(Math.random() * 10000),
-          Username: username,
-          FullName: fullName,
-          Email: email,
-          Role: 'User',
-          token: 'mock-jwt-token-new',
-        },
-      };
+    } catch (e) {
+      return { success: false, error: 'Server error' };
     }
   },
 
-  login: async (username: string, password: string): Promise<{ success: boolean; token?: string; user?: User }> => {
+  login: async (username: string, password: string): Promise<{ success: boolean; token?: string; user?: User; error?: string }> => {
     try {
       const res = await fetch(`${BASE_URL}/api/login`, {
         method: 'POST',
@@ -303,78 +297,36 @@ export const api = {
         body: JSON.stringify({ username, password }),
       });
       return await res.json();
-    } catch {
-      // Mock login thành công
-      if (username && password) {
-        return {
-          success: true,
-          token: 'mock-jwt-token-12345',
-          user: {
-            UserID: 1,
-            Username: username,
-            FullName: 'Nguyễn Văn A',
-            Email: `${username}@gmail.com`,
-            Role: 'User',
-            token: 'mock-jwt-token-12345',
-          },
-        };
-      }
-      return { success: false };
+    } catch (e) {
+      return { success: false, error: 'Server error' };
     }
   },
 
   // --- BOOKING ---
-  confirmBooking: async (
-    screeningId: number,
-    seats: SeatInfo[],
-    token: string,
-  ): Promise<{ success: boolean; bookingID?: number }> => {
+  confirmBooking: async (screeningId: number, seats: SeatInfo[], token: string): Promise<{ success: boolean; bookingID?: number; error?: string }> => {
     try {
       const res = await fetch(`${BASE_URL}/api/book/${screeningId}/confirm`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: token },
         body: JSON.stringify({ seats }),
       });
       return await res.json();
-    } catch {
-      const bookingID = Math.floor(Math.random() * 900000) + 100000;
-      
-      // Đánh dấu ghế đã bán cho riêng suất chiếu này
-      if (!MOCK_OCCUPIED_SEATS[screeningId]) MOCK_OCCUPIED_SEATS[screeningId] = [];
-      seats.forEach(s => {
-        MOCK_OCCUPIED_SEATS[screeningId].push({ row: s.row, number: s.number });
-      });
-
-      // Thêm vé vào danh sách vé của tôi
-      const scr = MOCK_SCREENINGS.find(s => s.ScreeningID === screeningId);
-      if (scr) {
-        MOCK_BOOKINGS.unshift({
-          BookingID: bookingID,
-          MovieTitle: scr.MovieTitle + (scr.SeatType ? ` (${scr.SeatType})` : ''),
-          PosterURL: scr.PosterURL,
-          RoomName: scr.RoomName,
-          StartTime: scr.StartTime,
-          Seats: seats.map(s => `${s.row}${s.number}`).join(', '),
-          TotalPrice: seats.reduce((sum, s) => sum + s.price, 0),
-          Status: 'Paid',
-        });
-      }
-
-      return { success: true, bookingID };
+    } catch (e) {
+      return { success: false, error: 'Lỗi kết nối server' };
     }
   },
 
   getMyBookings: async (token: string): Promise<Booking[]> => {
     try {
+      if (!token) return [];
       const res = await fetch(`${BASE_URL}/api/my-tickets`, {
         headers: { Authorization: token },
       });
-      return await res.json();
-    } catch {
-      return MOCK_BOOKINGS;
+      const data = await res.json();
+      // Server trả array, nếu không phải array (ví dụ lỗi 401) thì trả []
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      return [];
     }
   },
 };
@@ -384,7 +336,7 @@ export function formatPrice(price: number): string {
   return price.toLocaleString('vi-VN') + 'đ';
 }
 
-// Helper: format ngày giờ VN
+// Helper: format ngày giờ VN (cố định múi giờ VN để tránh sai ngày trên emulator)
 export function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString('vi-VN', {
     hour: '2-digit',
@@ -392,13 +344,38 @@ export function formatDateTime(iso: string): string {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+    timeZone: 'Asia/Ho_Chi_Minh'
   });
 }
 
 export function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleTimeString('vi-VN', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    timeZone: 'Asia/Ho_Chi_Minh'
+  });
 }
 
 export function formatDateShort(iso: string): string {
-  return new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  return new Date(iso).toLocaleDateString('vi-VN', { 
+    day: '2-digit', 
+    month: '2-digit',
+    timeZone: 'Asia/Ho_Chi_Minh'
+  });
+}
+
+export function getVNDateString(iso: string): string {
+  const d = new Date(iso);
+  const parts = new Intl.DateTimeFormat('en-CA', { // en-CA format là YYYY-MM-DD
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(d);
+  
+  const year = parts.find(p => p.type === 'year')?.value;
+  const month = parts.find(p => p.type === 'month')?.value;
+  const day = parts.find(p => p.type === 'day')?.value;
+  
+  return `${year}-${month}-${day}`;
 }

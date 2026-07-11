@@ -65,8 +65,10 @@
                 <td><%= new Date(s.EndTime).toLocaleString('vi-VN') %></td>
                 <td><%= s.BasePrice.toLocaleString() %>đ</td>
                 <td class="actions">
-                  <button class="edit-btn">Sửa</button>
-                  <button class="delete-btn" onclick="if(confirm('Xóa suất chiếu?'))alert('Đã xóa')">Xóa</button>
+                  <button class="edit-btn" onclick="alert('Tính năng sửa đang được cập nhật')">Sửa</button>
+                  <form action="/admin/screenings/<%= s.ScreeningID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa suất chiếu này? (Sẽ xóa luôn vé/hóa đơn liên quan)');">
+                    <button type="submit" class="delete-btn">Xóa</button>
+                  </form>
                 </td>
               </tr>
             <% }); %>

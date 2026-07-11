@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Movie, ScreeningByRoom, Comment, User } from '@/types';
-import { api, formatDateShort, formatTime, formatPrice } from '@/services/api';
+import { api, formatDateShort, formatTime, formatPrice, getVNDateString } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
 export default function MovieDetailScreen() {
@@ -56,12 +56,14 @@ export default function MovieDetailScreen() {
       if (isMounted) {
         setMovie(m);
         setScreenings(s);
-        setComments(c);
+        // Đảm bảo comments luôn là array hợp lệ
+        setComments(Array.isArray(c) ? c : []);
 
         // Trích xuất danh sách ngày có suất chiếu
+        // Dùng getVNDateString để format cố định theo múi giờ Châu Á/Hồ Chí Minh
         const allDates = new Set<string>();
         Object.values(s).flat().forEach(scr => {
-          allDates.add(scr.StartTime.split('T')[0]);
+          allDates.add(getVNDateString(scr.StartTime));
         });
         const dateArr = Array.from(allDates).sort();
         setDates(dateArr);
@@ -91,10 +93,12 @@ export default function MovieDetailScreen() {
     const res = await api.submitComment(Number(id), ratingInput, commentInput, currentUser);
     setIsSubmitting(false);
 
-    if (res.success) {
-      setComments([res.comment, ...comments]);
+    if (res.success && res.comment) {
+      setComments(prev => [res.comment!, ...prev]);
       setCommentInput('');
       setRatingInput(5);
+    } else {
+      Alert.alert('Lỗi', 'Gửi bình luận thất bại. Vui lòng đăng nhập lại.');
     }
   };
 
@@ -117,9 +121,10 @@ export default function MovieDetailScreen() {
     );
   }
 
-  // Calculate Average Rating
-  const avgRating = comments.length > 0 
-    ? (comments.reduce((sum, c) => sum + c.Rating, 0) / comments.length).toFixed(1)
+  // Calculate Average Rating — dùng Number() để tránh crash nếu Rating là string
+  const validComments = comments.filter(c => c && c.Rating != null);
+  const avgRating = validComments.length > 0
+    ? (validComments.reduce((sum, c) => sum + Number(c.Rating), 0) / validComments.length).toFixed(1)
     : 'Chưa có';
 
   return (
@@ -186,8 +191,8 @@ export default function MovieDetailScreen() {
 
               {/* Screenings by Room */}
               {Object.entries(screenings).map(([room, list]) => {
-                // Filter suất chiếu theo ngày
-                const dayList = list.filter(s => s.StartTime.startsWith(activeDate));
+                // Filter suất chiếu theo ngày — dùng getVNDateString
+                const dayList = list.filter(s => getVNDateString(s.StartTime) === activeDate);
                 if (dayList.length === 0) return null;
 
                 return (
