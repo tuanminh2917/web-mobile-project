@@ -13,7 +13,7 @@ interface SeatMapProps {
 const ROW_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export default function SeatMap({ config, selectedSeats, onSelect, onDeselect }: SeatMapProps) {
-  
+
   // Kiểm tra ghế đã bán
   const isOccupied = (rowLabel: string, seatNum: number) => {
     return config.occupiedSeats.some(s => s.row === rowLabel && s.number === seatNum);
@@ -40,7 +40,7 @@ export default function SeatMap({ config, selectedSeats, onSelect, onDeselect }:
   };
 
   const getPrice = (type: SeatType) => {
-    switch(type) {
+    switch (type) {
       case 'vip': return config.vipPrice;
       case 'couple': return config.couplePrice;
       default: return config.regularPrice;
@@ -50,7 +50,7 @@ export default function SeatMap({ config, selectedSeats, onSelect, onDeselect }:
   const getSeatColor = (type: SeatType, isSelected: boolean, occupied: boolean) => {
     if (occupied) return '#374151'; // Xám tối
     if (isSelected) return Colors.dark.buttonPrimary;
-    switch(type) {
+    switch (type) {
       case 'vip': return '#f59e0b'; // Vàng
       case 'couple': return '#ec4899'; // Hồng
       default: return '#3b82f6'; // Xanh dương
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   screenLine: { width: '100%', height: 4, backgroundColor: Colors.dark.buttonPrimary, borderRadius: 2, shadowColor: Colors.dark.buttonPrimary, shadowOpacity: 0.8, shadowRadius: 10, elevation: 5 },
   screenText: { color: '#9ca3af', fontSize: 10, fontWeight: 'bold', marginTop: 8, letterSpacing: 2 },
   scrollArea: { paddingBottom: 20 },
-  mapGrid: { gap: 6 },
+  mapGrid: { gap: 6, alignItems: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   rowLabel: { width: 20, color: '#9ca3af', fontWeight: 'bold', fontSize: 12, textAlign: 'center' },
   seat: { width: 26, height: 26, borderRadius: 5, justifyContent: 'center', alignItems: 'center' },
