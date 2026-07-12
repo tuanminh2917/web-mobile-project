@@ -155,7 +155,7 @@ router.post('/admin/screenings', requireAdmin, async (req, res) => {
 
     // Kiểm tra giờ bắt đầu phải sau thời điểm hiện tại
     if (new Date(startTime) <= new Date()) {
-      req.session.adminError = '❌ Giờ bắt đầu phải sau thời điểm hiện tại.';
+      req.session.adminError = 'Giờ bắt đầu phải sau thời điểm hiện tại.';
       return res.redirect('/admin/screenings');
     }
 
@@ -178,7 +178,7 @@ router.post('/admin/screenings', requireAdmin, async (req, res) => {
     `, [roomID, endTime, startTime]);
 
     if (conflicts.length > 0) {
-      req.session.adminError = `❌ Phòng này đã có suất chiếu trùng giờ. Vui lòng chọn giờ hoặc phòng khác.`;
+      req.session.adminError = `Phòng này đã có suất chiếu trùng giờ. Vui lòng chọn giờ hoặc phòng khác.`;
       return res.redirect('/admin/screenings');
     }
 
@@ -187,11 +187,11 @@ router.post('/admin/screenings', requireAdmin, async (req, res) => {
       [movieID, roomID, startTime, endTime, parseFloat(basePrice)]
     );
 
-    req.session.adminSuccess = '✅ Thêm suất chiếu thành công!';
+    req.session.adminSuccess = 'Thêm suất chiếu thành công!';
     res.redirect('/admin/screenings');
   } catch (err) {
     console.error('Screening add error:', err);
-    req.session.adminError = '❌ Lỗi server: ' + err.message;
+    req.session.adminError = 'Lỗi server: ' + err.message;
     res.redirect('/admin/screenings');
   }
 });
@@ -204,11 +204,11 @@ router.post('/admin/screenings/:id/delete', requireAdmin, async (req, res) => {
     await db.query('DELETE FROM Booking WHERE ScreeningID = ?', [screeningID]);
     await db.query('DELETE FROM Screening WHERE ScreeningID = ?', [screeningID]);
     
-    req.session.adminSuccess = '✅ Đã xóa suất chiếu thành công!';
+    req.session.adminSuccess = 'Đã xóa suất chiếu thành công!';
     res.redirect('/admin/screenings');
   } catch (err) {
     console.error('Screening delete error:', err);
-    req.session.adminError = '❌ Lỗi khi xóa: ' + err.message;
+    req.session.adminError = 'Lỗi khi xóa: ' + err.message;
     res.redirect('/admin/screenings');
   }
 });
@@ -220,7 +220,7 @@ router.post('/admin/screenings/:id/update', requireAdmin, async (req, res) => {
 
     // Kiểm tra giờ bắt đầu phải sau thời điểm hiện tại
     if (new Date(startTime) <= new Date()) {
-      req.session.adminError = '❌ Giờ bắt đầu phải sau thời điểm hiện tại.';
+      req.session.adminError = 'Giờ bắt đầu phải sau thời điểm hiện tại.';
       return res.redirect('/admin/screenings');
     }
 
@@ -244,7 +244,7 @@ router.post('/admin/screenings/:id/update', requireAdmin, async (req, res) => {
     `, [roomID, endTime, startTime, screeningID]);
 
     if (conflicts.length > 0) {
-      req.session.adminError = '❌ Phòng này đã có suất chiếu trùng giờ. Vui lòng chọn giờ hoặc phòng khác.';
+      req.session.adminError = 'Phòng này đã có suất chiếu trùng giờ. Vui lòng chọn giờ hoặc phòng khác.';
       return res.redirect('/admin/screenings');
     }
 
@@ -253,11 +253,11 @@ router.post('/admin/screenings/:id/update', requireAdmin, async (req, res) => {
       [movieID, roomID, startTime, endTime, parseFloat(basePrice), screeningID]
     );
 
-    req.session.adminSuccess = '✅ Cập nhật suất chiếu thành công!';
+    req.session.adminSuccess = 'Cập nhật suất chiếu thành công!';
     res.redirect('/admin/screenings');
   } catch (err) {
     console.error('Screening update error:', err);
-    req.session.adminError = '❌ Lỗi server: ' + err.message;
+    req.session.adminError = 'Lỗi server: ' + err.message;
     res.redirect('/admin/screenings');
   }
 });

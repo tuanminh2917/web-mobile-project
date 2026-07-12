@@ -120,7 +120,7 @@ router.post('/login', async (req, res) => {
     
     if (!match) return res.status(401).json({ error: 'Invalid credentials' });
 
-    // Trả về JSON cho mobile app (không dùng session render html)
+    // Trả về JSON cho mobile app 
     res.json({
       success: true,
       token: 'dummy-token-' + user.UserID,
@@ -139,7 +139,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Hàm hỗ trợ lấy UserID từ token ảo
+
 function getUserIdFromToken(req) {
   const auth = req.headers.authorization;
   if (auth && auth.startsWith('dummy-token-')) {
