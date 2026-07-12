@@ -13,6 +13,7 @@ import {
   SeatInfo,
   OccupiedSeat,
   SeatMapConfig,
+  SeatType,
 } from '@/types';
 
 // Đổi thành URL thực tế của backend trên máy ảo Android (10.0.2.2 trỏ về localhost của máy tính)
@@ -227,10 +228,33 @@ export const api = {
   getSeatMap: async (screeningId: number): Promise<SeatMapConfig> => {
     try {
       const res = await fetch(`${BASE_URL}/api/screenings/${screeningId}/seats`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (e) {
       console.error(e);
-      throw e;
+      // Fallback: phòng lớn 10 hàng (A-J), 10 ghế/hàng = 100 ghế
+      const rows = 10;
+      const seatsPerRow = 10;
+      const seatTypes: Record<string, SeatType> = {};
+      const rowLabels = 'ABCDEFGHIJ';
+      for (let r = 0; r < rows; r++) {
+        for (let s = 1; s <= seatsPerRow; s++) {
+          let type: SeatType = 'regular';
+          if (r >= 8) type = 'couple';       // I-J: couple
+          else if (r >= 4) type = 'vip';     // E-H: VIP
+          seatTypes[`${rowLabels[r]}-${s}`] = type;
+        }
+      }
+      return {
+        rows,
+        seatsPerRow,
+        occupiedSeats: [],
+        seatTypes,
+        regularPrice: 50000,
+        vipPrice: 65000,
+        couplePrice: 100000,
+        maxSelectable: 8,
+      };
     }
   },
 

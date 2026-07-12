@@ -172,7 +172,12 @@ export default function MovieDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Lịch chiếu</Text>
           
-          {dates.length > 0 ? (
+          {movie.Status === 'Up Coming' ? (
+            <View style={{ backgroundColor: Colors.dark.backgroundElement, padding: 20, borderRadius: 12, borderWidth: 1, borderColor: Colors.dark.backgroundSelected, alignItems: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Phim sắp ra mắt</Text>
+              <Text style={{ color: Colors.dark.textSecondary, fontSize: 14 }}>Dự kiến khởi chiếu từ ngày {new Date(movie.ReleaseDate).toLocaleDateString('vi-VN')}</Text>
+            </View>
+          ) : dates.length > 0 ? (
             <>
               {/* Date Tabs */}
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dateTabs}>

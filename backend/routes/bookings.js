@@ -203,6 +203,60 @@ router.get('/checkout/:id', async (req, res) => {
   }
 });
 
+// Mobile API: get full seat map config (JSON)
+router.get('/api/screenings/:screeningID/seats', async (req, res) => {
+  try {
+    const [screenings] = await db.query(`
+      SELECT s.*, r.RoomID, r.RoomName FROM Screening s
+      JOIN Room r ON s.RoomID = r.RoomID
+      WHERE s.ScreeningID = ?
+    `, [req.params.screeningID]);
+
+    if (screenings.length === 0) return res.status(404).json({ error: 'Not found' });
+    const screening = screenings[0];
+
+    const [seats] = await db.query(
+      'SELECT * FROM Seat WHERE RoomID = ? ORDER BY Row, Number',
+      [screening.RoomID]
+    );
+
+    const [occupied] = await db.query(`
+      SELECT DISTINCT t.Row, t.Number
+      FROM Ticket t
+      JOIN Booking b ON t.BookingID = b.BookingID
+      WHERE t.ScreeningID = ? AND b.Status IN ('Pending', 'Paid')
+    `, [req.params.screeningID]);
+
+    const seatTypes = {};
+    seats.forEach(s => {
+      const raw = s.SeatType;
+      const type = raw === 'VIP' ? 'vip'
+        : (raw === 'Couple Seat' || raw === 'Couple') ? 'couple'
+        : 'regular';
+      seatTypes[`${s.Row}-${s.Number}`] = type;
+    });
+
+    const maxRow = seats.reduce((max, s) => Math.max(max, s.Row.charCodeAt(0)), 64);
+    const rows = maxRow - 64;
+    const counts = seats.reduce((acc, s) => { acc[s.Row] = (acc[s.Row] || 0) + 1; return acc; }, {});
+    const seatsPerRow = Math.max(...Object.values(counts));
+
+    res.json({
+      rows,
+      seatsPerRow,
+      occupiedSeats: occupied.map(o => ({ row: o.Row, number: o.Number })),
+      seatTypes,
+      regularPrice: parseFloat(screening.BasePrice),
+      vipPrice: Math.round(parseFloat(screening.BasePrice) * 1.3),
+      couplePrice: parseFloat(screening.BasePrice) * 2,
+      maxSelectable: 8
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // AJAX: check seat availability
 router.get('/api/seats/:screeningID', async (req, res) => {
   try {

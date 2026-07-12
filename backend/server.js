@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 
 // View counter middleware
 app.use(async (req, res, next) => {
-  if (req.path.startsWith('/assets') || req.path.startsWith('/js')) return next();
+  if (req.path.startsWith('/assets') || req.path.startsWith('/js') || req.path.startsWith('/api')) return next();
   try {
     const db = require('./database/db');
     await db.query('UPDATE SystemStats SET ViewCount = ViewCount + 1, LastUpdated = CURRENT_TIMESTAMP WHERE StatID = 1');

@@ -178,8 +178,8 @@
 
 @media (max-width: 600px) {
   .seat { width: 30px; height: 30px; font-size: 9px; }
-  .seat.couple { width: 66px; }
+  .seat.couple { width: 64px; }
   .seat.small { width: 22px; height: 22px; font-size: 7px; }
-  .seat.couple.small { width: 50px; }
+  .seat.couple.small { width: 48px; }
   .seat-row { gap: 4px; }
 }

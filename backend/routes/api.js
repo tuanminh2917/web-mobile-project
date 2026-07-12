@@ -245,19 +245,44 @@ router.post('/movies/:id/comments', async (req, res) => {
 router.get('/screenings/:id/seats', async (req, res) => {
   try {
     const screeningId = req.params.id;
+    
+    // Get screening info to get RoomID
+    const [screenings] = await db.query('SELECT RoomID FROM Screening WHERE ScreeningID = ?', [screeningId]);
+    if (screenings.length === 0) return res.status(404).json({ error: 'Screening not found' });
+    const roomId = screenings[0].RoomID;
+
+    // Get room seat config
+    const [seats] = await db.query('SELECT * FROM Seat WHERE RoomID = ? ORDER BY Row, Number', [roomId]);
+
+    // Build seat type map
+    const seatTypes = {};
+    seats.forEach(s => {
+      seatTypes[`${s.Row}-${s.Number}`] = s.SeatType === 'Regular' ? 'regular' : s.SeatType === 'VIP' ? 'vip' : 'couple';
+    });
+
+    // Determine layout
+    const maxRow = seats.reduce((max, s) => Math.max(max, s.Row.charCodeAt(0)), 64);
+    const rows = maxRow > 64 ? maxRow - 64 : 10;
+    const counts = seats.reduce((acc, s) => {
+      acc[s.Row] = (acc[s.Row] || 0) + 1;
+      return acc;
+    }, {});
+    const seatsPerRow = Object.values(counts).length > 0 ? Math.max(...Object.values(counts)) : 12;
+
     // Tìm các ghế đã được đặt
     const [tickets] = await db.query(`
-      SELECT Row, Number FROM Ticket WHERE ScreeningID = ?
+      SELECT t.Row, t.Number FROM Ticket t
+      JOIN Booking b ON t.BookingID = b.BookingID
+      WHERE t.ScreeningID = ? AND b.Status IN ('Pending', 'Paid')
     `, [screeningId]);
     
     const occupiedSeats = tickets.map(t => ({ row: t.Row, number: t.Number }));
     
-    // Config cứng cho rạp tạm thời
     res.json({
-      rows: 10,
-      seatsPerRow: 12,
+      rows,
+      seatsPerRow,
       occupiedSeats,
-      seatTypes: {},
+      seatTypes,
       regularPrice: 80000,
       vipPrice: 100000,
       couplePrice: 200000,

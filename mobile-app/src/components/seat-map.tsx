@@ -19,18 +19,23 @@ export default function SeatMap({ config, selectedSeats, onSelect, onDeselect }:
     return config.occupiedSeats.some(s => s.row === rowLabel && s.number === seatNum);
   };
 
-  // Xác định loại ghế (logic như bên js)
+  // Xác định loại ghế (dựa vào seatTypes từ API, fallback theo layout)
   const getSeatType = (rowIdx: number, seatNum: number, rowLabel: string): SeatType => {
     const cacheKey = `${rowLabel}-${seatNum}`;
     if (config.seatTypes && config.seatTypes[cacheKey]) {
       return config.seatTypes[cacheKey];
     }
-    const lastRow = config.rows - 1;
-    const midStart = Math.floor(config.rows * 0.4);
-    const midEnd = Math.floor(config.rows * 0.7);
-
-    if (rowIdx === lastRow) return 'couple';
-    if (rowIdx >= midStart && rowIdx < midEnd) return 'vip';
+    const tot = config.rows;
+    // Phòng lớn (10 hàng): A-D Regular, E-H VIP, I-J Couple
+    // Phòng nhỏ (8 hàng):  A-C Regular, D-F VIP,  G-H Couple
+    if (tot === 10) {
+      if (rowIdx >= 8) return 'couple';
+      if (rowIdx >= 4) return 'vip';
+      return 'regular';
+    }
+    // tot === 8 (phòng nhỏ)
+    if (rowIdx >= 6) return 'couple';
+    if (rowIdx >= 3) return 'vip';
     return 'regular';
   };
 
@@ -72,7 +77,12 @@ export default function SeatMap({ config, selectedSeats, onSelect, onDeselect }:
         <Text style={styles.screenText}>MÀN HÌNH</Text>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollArea}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={true}
+        contentContainerStyle={styles.scrollArea}
+        nestedScrollEnabled
+      >
         <View style={styles.mapGrid}>
           {Array.from({ length: config.rows }).map((_, rIdx) => {
             const rowLabel = ROW_LABELS[rIdx];
@@ -82,10 +92,13 @@ export default function SeatMap({ config, selectedSeats, onSelect, onDeselect }:
                 {Array.from({ length: config.seatsPerRow }).map((_, sIdx) => {
                   const num = sIdx + 1;
                   const type = getSeatType(rIdx, num, rowLabel);
+                  const isCouple = type === 'couple';
+                  // Hàng đôi: chỉ hiện 5 ghế, số 1→5, bỏ vị trí chẵn
+                  if (isCouple && num % 2 === 0) return null;
+                  const displayNum = isCouple ? (num + 1) / 2 : num;
                   const occupied = isOccupied(rowLabel, num);
                   const isSelected = selectedSeats.some(s => s.row === rowLabel && s.number === num);
                   const seatInfo: SeatInfo = { row: rowLabel, number: num, type, price: getPrice(type) };
-                  const isCouple = type === 'couple';
 
                   return (
                     <Pressable
@@ -93,12 +106,16 @@ export default function SeatMap({ config, selectedSeats, onSelect, onDeselect }:
                       style={[
                         styles.seat,
                         { backgroundColor: getSeatColor(type, isSelected, occupied) },
-                        isCouple && styles.seatCouple
+                        isCouple && styles.seatCouple,
                       ]}
                       onPress={() => handlePress(seatInfo, occupied, isSelected)}
                     >
-                      <Text style={[styles.seatText, occupied && {color: '#9ca3af'}]}>
-                        {num}
+                      <Text style={[
+                        styles.seatText,
+                        occupied && styles.seatTextOccupied,
+                        isSelected && styles.seatTextSelected,
+                      ]}>
+                        {displayNum}
                       </Text>
                     </Pressable>
                   );
@@ -130,17 +147,22 @@ function LegendItem({ color, label }: { color: string; label: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center' },
+  container: { alignItems: 'center', width: '100%' },
   screenIndicator: { width: '80%', alignItems: 'center', marginBottom: 20 },
   screenLine: { width: '100%', height: 4, backgroundColor: Colors.dark.buttonPrimary, borderRadius: 2, shadowColor: Colors.dark.buttonPrimary, shadowOpacity: 0.8, shadowRadius: 10, elevation: 5 },
   screenText: { color: '#9ca3af', fontSize: 10, fontWeight: 'bold', marginTop: 8, letterSpacing: 2 },
-  scrollArea: { paddingHorizontal: 16, paddingBottom: 20 },
-  mapGrid: { gap: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  scrollArea: { paddingBottom: 20 },
+  mapGrid: { gap: 6 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   rowLabel: { width: 20, color: '#9ca3af', fontWeight: 'bold', fontSize: 12, textAlign: 'center' },
-  seat: { width: 30, height: 30, borderRadius: 6, justifyContent: 'center', alignItems: 'center' },
-  seatCouple: { width: 68 }, // Rộng gấp đôi
+  seat: { width: 26, height: 26, borderRadius: 5, justifyContent: 'center', alignItems: 'center' },
+  seatCouple: { width: 56 },
   seatText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
+  seatTextOccupied: { color: '#9ca3af' },
+  seatTextSelected: { color: '#fff' },
+  seatSmall: { width: 16, height: 16 },
+  seatSmallCouple: { width: 36 },
+  seatSmallText: { fontSize: 6 },
   legend: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12, marginTop: 10 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   legendBox: { width: 14, height: 14, borderRadius: 3 },

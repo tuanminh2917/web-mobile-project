@@ -51,13 +51,12 @@ export default function BookScreen() {
   const handleCheckout = () => {
     if (!user) {
       alert('Vui lòng đăng nhập để tiếp tục.');
-      // Có thể navigate sang tab account, tạm thời để user tự qua
       router.push('/account');
       return;
     }
-    // Truyền state qua JSON stringify query params để qua trang checkout (Next.js/Expo router pattern)
+    if (!screening) return;
     router.push({
-      pathname: `/checkout/${screening?.ScreeningID}`,
+      pathname: `/checkout/${screening.ScreeningID}` as any,
       params: {
         seats: JSON.stringify(selectedSeats),
         total: total.toString()
@@ -93,15 +92,13 @@ export default function BookScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView style={{ flex: 1 }}>
-        {/* Info Box */}
+      <ScrollView style={{ flex: 1 }} nestedScrollEnabled>
         <View style={styles.infoBox}>
           <Text style={styles.movieTitle}>{screening.MovieTitle}</Text>
           <Text style={styles.infoText}>{screening.RoomName} · {screening.SeatType || '2D'}</Text>
           <Text style={styles.infoText}>{formatDateTime(screening.StartTime)}</Text>
         </View>
 
-        {/* Seat Map component */}
         <SeatMap
           config={config}
           selectedSeats={selectedSeats}

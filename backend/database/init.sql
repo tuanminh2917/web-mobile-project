@@ -128,7 +128,8 @@ INSERT INTO Movie (Title, Genre, Director, Actor, Languages, Censorship, Duratio
 ('Avengers: Endgame', 'Hành động', 'Anthony Russo', 'Robert Downey Jr., Chris Evans', 'Phụ đề', 'T13', 181, '2019-04-26', 'Stoped', 'Trận chiến cuối cùng của các siêu anh hùng.', '/assets/avengers-poster.jpg'),
 ('Dune: Part Two', 'Khoa học viễn tưởng', 'Denis Villeneuve', 'Timothée Chalamet, Zendaya', 'Phụ đề', 'T13', 166, '2026-06-15', 'Up Coming', 'Hành trình của Paul Atreides tại Arrakis.', '/assets/dune-poster.jpg');
 
--- Generate seats for Large rooms (1,2): 10 rows (A-J), 15 seats/row
+-- Generate seats for Large rooms (1,2): 10 rows (A-J) x 10 seats/row = 100
+-- A-D: Regular, E-H: VIP, I-J: Couple Seat
 INSERT INTO Seat (RoomID, Row, Number, SeatType)
 SELECT r.RoomID, lbl, num,
   CASE
@@ -142,21 +143,20 @@ CROSS JOIN (SELECT 'A' AS lbl UNION SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'
             UNION SELECT 'I' UNION SELECT 'J') row_data
 CROSS JOIN (SELECT 1 AS num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
             UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8
-            UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
-            UNION SELECT 13 UNION SELECT 14 UNION SELECT 15) nums;
+            UNION SELECT 9 UNION SELECT 10) nums;
 
--- Generate seats for Small rooms (3,4,5): 10 rows (A-J), 10 seats/row
+-- Generate seats for Small rooms (3,4,5): 8 rows (A-H) x 10 seats/row = 80
+-- A-C: Regular, D-F: VIP, G-H: Couple Seat
 INSERT INTO Seat (RoomID, Row, Number, SeatType)
 SELECT r.RoomID, lbl, num,
   CASE
-    WHEN lbl IN ('I', 'J') THEN 'Couple Seat'
-    WHEN lbl IN ('E', 'F', 'G', 'H') THEN 'VIP'
+    WHEN lbl IN ('G', 'H') THEN 'Couple Seat'
+    WHEN lbl IN ('D', 'E', 'F') THEN 'VIP'
     ELSE 'Regular'
   END
 FROM (SELECT 3 AS RoomID UNION SELECT 4 UNION SELECT 5) r
 CROSS JOIN (SELECT 'A' AS lbl UNION SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'
-            UNION SELECT 'E' UNION SELECT 'F' UNION SELECT 'G' UNION SELECT 'H'
-            UNION SELECT 'I' UNION SELECT 'J') row_data
+            UNION SELECT 'E' UNION SELECT 'F' UNION SELECT 'G' UNION SELECT 'H') row_data
 CROSS JOIN (SELECT 1 AS num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
             UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8
             UNION SELECT 9 UNION SELECT 10) nums;
