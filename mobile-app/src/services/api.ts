@@ -250,9 +250,9 @@ export const api = {
         seatsPerRow,
         occupiedSeats: [],
         seatTypes,
-        regularPrice: 50000,
-        vipPrice: 65000,
-        couplePrice: 100000,
+        regularPrice: 80000,
+        vipPrice: Math.round(80000 * 1.3),
+        couplePrice: 80000 * 2,
         maxSelectable: 8,
       };
     }
