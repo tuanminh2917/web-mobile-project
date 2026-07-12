@@ -165,10 +165,16 @@ router.get('/my-tickets', async (req, res) => {
     // Get tickets for each booking
     for (let i = 0; i < bookings.length; i++) {
       const [tickets] = await db.query(`
-        SELECT * FROM Ticket WHERE BookingID = ?
+        SELECT t.*, COALESCE(st.SeatType, 'Regular') AS SeatType
+        FROM Ticket t
+        LEFT JOIN Seat st ON t.RoomID = st.RoomID AND t.Row = st.Row AND t.Number = st.Number
+        WHERE t.BookingID = ?
       `, [bookings[i].BookingID]);
 
-      bookings[i].Seats = tickets.map(t => `${t.Row}${t.Number}`).join(', ');
+      bookings[i].Seats = tickets.map(t => {
+        const num = t.SeatType === 'Couple Seat' ? (t.Number + 1) / 2 : t.Number;
+        return `${t.Row}${num}`;
+      }).join(', ');
       bookings[i].TotalPrice = tickets.reduce((sum, t) => sum + parseFloat(t.Price), 0);
     }
 

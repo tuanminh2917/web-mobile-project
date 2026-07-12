@@ -51,7 +51,7 @@
           </div>
           <div class="info-row">
             <span>Ghế</span>
-            <span class="value"><%= seats.map(s => s.row + s.number).join(', ') %></span>
+            <span class="value"><%= seats.map(s => s.row + (s.type === 'couple' ? (s.number + 1) / 2 : s.number)).join(', ') %></span>
           </div>
           <div class="info-row">
             <span>Mã đơn</span>
@@ -60,7 +60,7 @@
           <hr class="divider">
           <% seats.forEach(s => { %>
             <div class="info-row">
-              <span>Ghế <%= s.row %><%= s.number %> (<%= s.type === 'regular' ? 'Thường' : s.type === 'vip' ? 'VIP' : 'Đôi' %>)</span>
+              <span>Ghế <%= s.row %><%= s.type === 'couple' ? (s.number + 1) / 2 : s.number %> (<%= s.type === 'regular' ? 'Thường' : s.type === 'vip' ? 'VIP' : 'Đôi' %>)</span>
               <span class="value price"><%= s.price.toLocaleString() %>đ</span>
             </div>
           <% }); %>

@@ -36,10 +36,16 @@ router.get('/admin/dashboard', requireAdmin, async (req, res) => {
 
     // Get seats for each booking
     for (let i = 0; i < recentBookings.length; i++) {
-      const [tickets] = await db.query(
-        'SELECT * FROM Ticket WHERE BookingID = ?', [recentBookings[i].BookingID]
-      );
-      recentBookings[i].Seats = tickets.map(t => `${t.Row}${t.Number}`).join(', ');
+      const [tickets] = await db.query(`
+        SELECT t.*, COALESCE(st.SeatType, 'Regular') AS SeatType
+        FROM Ticket t
+        LEFT JOIN Seat st ON t.RoomID = st.RoomID AND t.Row = st.Row AND t.Number = st.Number
+        WHERE t.BookingID = ?
+      `, [recentBookings[i].BookingID]);
+      recentBookings[i].Seats = tickets.map(t => {
+        const num = t.SeatType === 'Couple Seat' ? (t.Number + 1) / 2 : t.Number;
+        return `${t.Row}${num}`;
+      }).join(', ');
       recentBookings[i].TotalPrice = tickets.reduce((sum, t) => sum + parseFloat(t.Price), 0);
     }
 
@@ -275,10 +281,17 @@ router.get('/admin/bookings', requireAdmin, async (req, res) => {
     `);
 
     for (let i = 0; i < bookings.length; i++) {
-      const [tickets] = await db.query(
-        'SELECT * FROM Ticket WHERE BookingID = ?', [bookings[i].BookingID]
-      );
-      bookings[i].Seats = tickets.map(t => `${t.Row}${t.Number}`).join(', ');
+      const [tickets] = await db.query(`
+        SELECT t.*, COALESCE(st.SeatType, 'Regular') AS SeatType
+        FROM Ticket t
+        LEFT JOIN Seat st ON t.RoomID = st.RoomID AND t.Row = st.Row AND t.Number = st.Number
+        WHERE t.BookingID = ?
+      `, [bookings[i].BookingID]);
+      bookings[i].Seats = tickets.map(t => {
+        const num = t.SeatType === 'Couple Seat' ? (t.Number + 1) / 2 : t.Number;
+        return `${t.Row}${num}`;
+      }).join(', ');
+    
       bookings[i].TotalPrice = tickets.reduce((sum, t) => sum + parseFloat(t.Price), 0);
     }
 

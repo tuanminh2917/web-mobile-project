@@ -116,7 +116,7 @@ export default function BookScreen() {
             <>
               <Text style={styles.summaryLabel}>Đã chọn {selectedSeats.length} ghế:</Text>
               <Text style={styles.seatsList} numberOfLines={1}>
-                {selectedSeats.map(s => `${s.row}${s.number}`).join(', ')}
+                {selectedSeats.map(s => `${s.row}${s.type === 'couple' ? (s.number + 1) / 2 : s.number}`).join(', ')}
               </Text>
             </>
           ) : (

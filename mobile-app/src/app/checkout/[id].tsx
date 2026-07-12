@@ -132,7 +132,7 @@ export default function CheckoutScreen() {
           <View style={styles.divider} />
           {selectedSeats.map(s => (
             <View key={`${s.row}${s.number}`} style={styles.infoRow}>
-              <Text style={styles.label}>Ghế {s.row}{s.number} ({s.type === 'regular'?'Thường':s.type==='vip'?'VIP':'Đôi'})</Text>
+              <Text style={styles.label}>Ghế {s.row}{s.type === 'couple' ? (s.number + 1) / 2 : s.number} ({s.type === 'regular'?'Thường':s.type==='vip'?'VIP':'Đôi'})</Text>
               <Text style={styles.priceValue}>{formatPrice(s.price)}</Text>
             </View>
           ))}

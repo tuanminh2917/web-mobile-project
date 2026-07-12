@@ -155,7 +155,7 @@ class SeatMap {
     summaryEl.innerHTML = `
       <h3>Ghế đã chọn (${seats.length})</h3>
       <div class="selected-list">
-        ${seats.map(s => `<span class="selected-seat">${s.row}${s.number} - ${this.getTypeLabel(s.type)} - ${s.price.toLocaleString()}đ</span>`).join('')}
+        ${seats.map(s => `<span class="selected-seat">${s.row}${s.type === 'couple' ? (s.number + 1) / 2 : s.number} - ${this.getTypeLabel(s.type)} - ${s.price.toLocaleString()}đ</span>`).join('')}
       </div>
       <div class="total">
         <span>Tổng cộng</span>

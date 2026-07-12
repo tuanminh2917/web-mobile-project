@@ -247,10 +247,11 @@ router.get('/screenings/:id/seats', async (req, res) => {
   try {
     const screeningId = req.params.id;
     
-    // Get screening info to get RoomID
-    const [screenings] = await db.query('SELECT RoomID FROM Screening WHERE ScreeningID = ?', [screeningId]);
+    // Get screening info to get RoomID and BasePrice
+    const [screenings] = await db.query('SELECT RoomID, BasePrice FROM Screening WHERE ScreeningID = ?', [screeningId]);
     if (screenings.length === 0) return res.status(404).json({ error: 'Screening not found' });
     const roomId = screenings[0].RoomID;
+    const basePrice = parseFloat(screenings[0].BasePrice);
 
     // Get room seat config
     const [seats] = await db.query('SELECT * FROM Seat WHERE RoomID = ? ORDER BY Row, Number', [roomId]);
@@ -284,9 +285,9 @@ router.get('/screenings/:id/seats', async (req, res) => {
       seatsPerRow,
       occupiedSeats,
       seatTypes,
-      regularPrice: 80000,
-      vipPrice: 100000,
-      couplePrice: 200000,
+      regularPrice: basePrice,
+      vipPrice: Math.round(basePrice * 1.3),
+      couplePrice: basePrice * 2,
       maxSelectable: 8,
     });
   } catch (err) {
@@ -346,10 +347,16 @@ router.get('/my-tickets', async (req, res) => {
     `, [userId]);
 
     for (let i = 0; i < bookings.length; i++) {
-      const [tickets] = await db.query(
-        'SELECT * FROM Ticket WHERE BookingID = ?', [bookings[i].BookingID]
-      );
-      bookings[i].Seats = tickets.map(t => `${t.Row}${t.Number}`).join(', ');
+      const [tickets] = await db.query(`
+        SELECT t.*, COALESCE(st.SeatType, 'Regular') AS SeatType
+        FROM Ticket t
+        LEFT JOIN Seat st ON t.RoomID = st.RoomID AND t.Row = st.Row AND t.Number = st.Number
+        WHERE t.BookingID = ?
+      `, [bookings[i].BookingID]);
+      bookings[i].Seats = tickets.map(t => {
+        const num = t.SeatType === 'Couple Seat' ? (t.Number + 1) / 2 : t.Number;
+        return `${t.Row}${num}`;
+      }).join(', ');
       bookings[i].TotalPrice = tickets.reduce((sum, t) => sum + parseFloat(t.Price), 0);
     }
 
