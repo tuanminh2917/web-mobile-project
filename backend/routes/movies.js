@@ -35,6 +35,7 @@ router.get('/showtime', async (req, res) => {
       JOIN Movie m ON s.MovieID = m.MovieID
       JOIN Room r ON s.RoomID = r.RoomID
       WHERE s.StartTime >= NOW()
+        AND m.Status = 'On Going'
       ORDER BY s.StartTime ASC
       LIMIT 20
     `);

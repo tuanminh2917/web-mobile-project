@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const bcrypt = require('bcrypt');
@@ -24,11 +23,10 @@ app.use(cookieParser());
 
 // Session
 app.use(session({
-  store: new FileStore({ path: path.join(__dirname, 'sessions') }),
   secret: 'cinema-booking-secret-key-2026',
   cookie: { maxAge: 15 * 60000 },
   saveUninitialized: true,
-  resave: false
+  resave: true
 }));
 
 // Make user available to all views
@@ -125,6 +123,7 @@ app.use((req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  if (res.headersSent) return next(err);
   res.status(500).send('500 - Lỗi server');
 });
 

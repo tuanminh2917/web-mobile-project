@@ -65,7 +65,13 @@
                 <td><%= new Date(s.EndTime).toLocaleString('vi-VN') %></td>
                 <td><%= s.BasePrice.toLocaleString() %>đ</td>
                 <td class="actions">
-                  <button class="edit-btn" onclick="alert('Tính năng sửa đang được cập nhật')">Sửa</button>
+                  <button class="edit-btn" 
+                    data-id="<%= s.ScreeningID %>"
+                    data-movieid="<%= s.MovieID %>"
+                    data-roomid="<%= s.RoomID %>"
+                    data-starttime="<%= new Date(s.StartTime).toISOString() %>"
+                    data-baseprice="<%= s.BasePrice %>"
+                    onclick="openEditModal(this)">Sửa</button>
                   <form action="/admin/screenings/<%= s.ScreeningID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa suất chiếu này? (Sẽ xóa luôn vé/hóa đơn liên quan)');">
                     <button type="submit" class="delete-btn">Xóa</button>
                   </form>
@@ -115,7 +121,7 @@
         </div>
         <div style="margin-bottom:16px;">
           <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Giờ bắt đầu</label>
-          <input type="datetime-local" name="startTime" 
+          <input type="datetime-local" name="startTime" id="startTimeInput"
             style="width:100%;padding:10px;background:#1e293b;border:1px solid var(--border-color);border-radius:6px;color:#fff;color-scheme:dark;" 
             required>
         </div>
@@ -131,26 +137,91 @@
     </div>
   </div>
 
+  <!-- Edit Screening Modal -->
+  <div id="editModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;padding:60px 20px;overflow-y:auto;">
+    <div style="max-width:500px;margin:0 auto;background:var(--bg-card);padding:30px;border-radius:12px;border:1px solid var(--border-color);">
+      <h2 style="color:var(--text-light);margin-bottom:20px;">Sửa suất chiếu</h2>
+      <form action="" method="POST" id="editForm">
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Phim</label>
+          <select name="movieID" id="editMovieId" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+            <option value="">Chọn phim</option>
+            <% if (typeof movies !== 'undefined') { %>
+              <% movies.forEach(m => { %>
+                <option value="<%= m.MovieID %>"><%= m.Title %></option>
+              <% }); %>
+            <% } %>
+          </select>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Phòng chiếu</label>
+          <select name="roomID" id="editRoomId" style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);" required>
+            <option value="">Chọn phòng</option>
+            <% if (typeof rooms !== 'undefined') { %>
+              <% rooms.forEach(r => { %>
+                <option value="<%= r.RoomID %>"><%= r.RoomName %></option>
+              <% }); %>
+            <% } %>
+          </select>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Giờ bắt đầu</label>
+          <input type="datetime-local" name="startTime" id="editStartTime"
+            style="width:100%;padding:10px;background:#1e293b;border:1px solid var(--border-color);border-radius:6px;color:#fff;color-scheme:dark;" 
+            required>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;color:var(--text-muted);font-size:13px;margin-bottom:4px;">Giá cơ bản</label>
+          <input type="number" name="basePrice" id="editBasePrice" readonly
+            style="width:100%;padding:10px;background:var(--bg-dark);border:1px solid var(--border-color);border-radius:6px;color:var(--text-light);opacity:0.7;cursor:not-allowed;" required>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('editModal').style.display='none'">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <%- include('../../components/footer') %>
   <script src="../../js/main.js"></script>
   <script>
-    // Tự điền giá trị mặc định cho datetime khi mở modal (tránh lỗi AM/PM trống)
+    function toDatetimeLocal(date) {
+      const d = new Date(date);
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
     function openAddModal() {
       const modal = document.getElementById('addModal');
       modal.style.display = 'block';
 
-      // Tạo ngày mai 09:00 làm mặc định
       const now = new Date();
       now.setDate(now.getDate() + 1);
       now.setHours(9, 0, 0, 0);
 
-      // Format: YYYY-MM-DDTHH:mm (chuẩn của datetime-local)
-      const pad = n => String(n).padStart(2, '0');
-      const val = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-      
+      const val = toDatetimeLocal(now);
       const dtInput = document.getElementById('startTimeInput');
       if (dtInput && !dtInput.value) dtInput.value = val;
     }
+
+    function openEditModal(btn) {
+      const modal = document.getElementById('editModal');
+      const form = document.getElementById('editForm');
+      form.action = '/admin/screenings/' + btn.dataset.id + '/update';
+
+      document.getElementById('editMovieId').value = btn.dataset.movieid;
+      document.getElementById('editRoomId').value = btn.dataset.roomid;
+      document.getElementById('editStartTime').value = toDatetimeLocal(btn.dataset.starttime);
+      document.getElementById('editBasePrice').value = btn.dataset.baseprice;
+
+      modal.style.display = 'block';
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'addModal') e.target.style.display = 'none';
+      if (e.target.id === 'editModal') e.target.style.display = 'none';
+    });
   </script>
 </body>
 </html>

@@ -98,9 +98,7 @@ export default function ScheduleScreen() {
             {/* Status tabs */}
             <View style={styles.statusTabs}>
               {[
-                { label: 'Tất cả', value: '' },
                 { label: 'Đang chiếu', value: 'On Going' },
-                { label: 'Sắp chiếu', value: 'Up Coming' },
               ].map(tab => (
                 <Pressable
                   key={tab.value}

@@ -18,9 +18,7 @@
       <p class="subtitle">Chọn phim và suất chiếu phù hợp với bạn</p>
 
       <div class="status-tabs">
-        <div class="status-tab active" data-status="">Tất cả</div>
-        <div class="status-tab" data-status="On Going">Đang chiếu</div>
-        <div class="status-tab" data-status="Up Coming">Sắp chiếu</div>
+        <div class="status-tab active" data-status="On Going">Đang chiếu</div>
       </div>
 
       <div class="date-tabs">
@@ -29,6 +27,7 @@
             <div class="date-tab <%= i === 0 ? 'active' : '' %>" data-date="<%= date %>">
               <span class="day"><%= new Date(date).toLocaleDateString('vi-VN', { weekday: 'short' }) %></span>
               <span class="date-num"><%= new Date(date).getDate() %></span>
+              <span class="month"><%= new Date(date).toLocaleDateString('vi-VN', { month: 'short' }) %></span>
             </div>
           <% }); %>
         <% } else { %>
