@@ -73,6 +73,7 @@
 }
 .date-tab .day { display: block; font-size: 13px; }
 .date-tab .date-num { display: block; font-size: 20px; font-weight: 700; }
+.date-tab .month { display: block; font-size: 11px; opacity: 0.7; }
 .date-tab:hover { border-color: var(--primary); color: var(--text-light); }
 .date-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 .room-showtimes { margin-bottom: 24px; }

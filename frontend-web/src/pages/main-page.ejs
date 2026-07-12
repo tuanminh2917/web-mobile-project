@@ -83,12 +83,12 @@
       <div class="movie-list grid-layout">
         <% if (typeof comingSoon !== 'undefined' && comingSoon.length) { %>
           <% comingSoon.forEach(movie => { %>
-            <div class="movie-item">
+            <a href="/movies/<%= movie.MovieID %>" class="movie-item">
               <img src="<%= movie.PosterURL || '/assets/poster-placeholder.jpg' %>" alt="<%= movie.Title %>">
               <h3><%= movie.Title %></h3>
               <p><%= movie.Genre %> &middot; <%= movie.Duration %> phút</p>
               <p>Dự kiến: <%= new Date(movie.ReleaseDate).toLocaleDateString('vi-VN') %></p>
-            </div>
+            </a>
           <% }); %>
         <% } else { %>
           <div class="movie-item">

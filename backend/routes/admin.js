@@ -36,10 +36,16 @@ router.get('/admin/dashboard', requireAdmin, async (req, res) => {
 
     // Get seats for each booking
     for (let i = 0; i < recentBookings.length; i++) {
-      const [tickets] = await db.query(
-        'SELECT * FROM Ticket WHERE BookingID = ?', [recentBookings[i].BookingID]
-      );
-      recentBookings[i].Seats = tickets.map(t => `${t.Row}${t.Number}`).join(', ');
+      const [tickets] = await db.query(`
+        SELECT t.*, COALESCE(st.SeatType, 'Regular') AS SeatType
+        FROM Ticket t
+        LEFT JOIN Seat st ON t.RoomID = st.RoomID AND t.Row = st.Row AND t.Number = st.Number
+        WHERE t.BookingID = ?
+      `, [recentBookings[i].BookingID]);
+      recentBookings[i].Seats = tickets.map(t => {
+        const num = t.SeatType === 'Couple Seat' ? (t.Number + 1) / 2 : t.Number;
+        return `${t.Row}${num}`;
+      }).join(', ');
       recentBookings[i].TotalPrice = tickets.reduce((sum, t) => sum + parseFloat(t.Price), 0);
     }
 
@@ -133,7 +139,12 @@ router.get('/admin/screenings', requireAdmin, async (req, res) => {
       ORDER BY s.StartTime DESC
     `);
     const [movies] = await db.query("SELECT MovieID, Title FROM Movie WHERE Status != 'Stoped'");
-    res.render('admin/screenings', { currentPage: 'admin', screenings, movies });
+    const [rooms] = await db.query('SELECT RoomID, RoomName FROM Room ORDER BY RoomID');
+    const adminError = req.session.adminError || null;
+    const adminSuccess = req.session.adminSuccess || null;
+    req.session.adminError = null;
+    req.session.adminSuccess = null;
+    res.render('admin/screenings', { currentPage: 'admin', screenings, movies, rooms, adminError, adminSuccess });
   } catch (err) {
     console.error(err);
     res.status(500).send('Lỗi server');
@@ -148,18 +159,111 @@ router.post('/admin/screenings', requireAdmin, async (req, res) => {
     const [movies] = await db.query('SELECT Duration FROM Movie WHERE MovieID = ?', [movieID]);
     const duration = movies[0]?.Duration || 120;
 
-    // Calculate end time (duration + 15min cleanup)
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + (duration + 15) * 60000);
+    // Kiểm tra giờ bắt đầu phải sau thời điểm hiện tại
+    if (new Date(startTime) <= new Date()) {
+      req.session.adminError = 'Giờ bắt đầu phải sau thời điểm hiện tại.';
+      return res.redirect('/admin/screenings');
+    }
+
+    // Tính EndTime bằng MySQL để tránh lỗi timezone của JS
+    // startTime từ form là "YYYY-MM-DDTHH:mm", MySQL dùng DATE_ADD tính đúng local time
+    const totalMinutes = duration + 15;
+
+    // Lấy EndTime bằng cách tính trong MySQL để đúng timezone
+    const [[{ endTime }]] = await db.query(
+      `SELECT DATE_ADD(?, INTERVAL ? MINUTE) AS endTime`,
+      [startTime, totalMinutes]
+    );
+
+    // Kiểm tra xung đột: cùng phòng, giờ chồng nhau
+    const [conflicts] = await db.query(`
+      SELECT ScreeningID FROM Screening
+      WHERE RoomID = ?
+        AND StartTime < ?
+        AND EndTime > ?
+    `, [roomID, endTime, startTime]);
+
+    if (conflicts.length > 0) {
+      req.session.adminError = `Phòng này đã có suất chiếu trùng giờ. Vui lòng chọn giờ hoặc phòng khác.`;
+      return res.redirect('/admin/screenings');
+    }
 
     await db.query(
       'INSERT INTO Screening (MovieID, RoomID, StartTime, EndTime, BasePrice) VALUES (?, ?, ?, ?, ?)',
-      [movieID, roomID, startTime, end.toISOString().slice(0, 19).replace('T', ' '), parseFloat(basePrice)]
+      [movieID, roomID, startTime, endTime, parseFloat(basePrice)]
     );
 
+    req.session.adminSuccess = 'Thêm suất chiếu thành công!';
     res.redirect('/admin/screenings');
   } catch (err) {
-    console.error(err);
+    console.error('Screening add error:', err);
+    req.session.adminError = 'Lỗi server: ' + err.message;
+    res.redirect('/admin/screenings');
+  }
+});
+
+router.post('/admin/screenings/:id/delete', requireAdmin, async (req, res) => {
+  try {
+    const screeningID = req.params.id;
+    // Phải xóa dữ liệu liên quan ở bảng Ticket và Booking trước khi xóa Screening
+    await db.query('DELETE FROM Ticket WHERE ScreeningID = ?', [screeningID]);
+    await db.query('DELETE FROM Booking WHERE ScreeningID = ?', [screeningID]);
+    await db.query('DELETE FROM Screening WHERE ScreeningID = ?', [screeningID]);
+    
+    req.session.adminSuccess = 'Đã xóa suất chiếu thành công!';
+    res.redirect('/admin/screenings');
+  } catch (err) {
+    console.error('Screening delete error:', err);
+    req.session.adminError = 'Lỗi khi xóa: ' + err.message;
+    res.redirect('/admin/screenings');
+  }
+});
+
+router.post('/admin/screenings/:id/update', requireAdmin, async (req, res) => {
+  try {
+    const { movieID, roomID, startTime, basePrice } = req.body;
+    const screeningID = req.params.id;
+
+    // Kiểm tra giờ bắt đầu phải sau thời điểm hiện tại
+    if (new Date(startTime) <= new Date()) {
+      req.session.adminError = 'Giờ bắt đầu phải sau thời điểm hiện tại.';
+      return res.redirect('/admin/screenings');
+    }
+
+    // Get movie duration
+    const [movies] = await db.query('SELECT Duration FROM Movie WHERE MovieID = ?', [movieID]);
+    const duration = movies[0]?.Duration || 120;
+    const totalMinutes = duration + 15;
+
+    const [[{ endTime }]] = await db.query(
+      `SELECT DATE_ADD(?, INTERVAL ? MINUTE) AS endTime`,
+      [startTime, totalMinutes]
+    );
+
+    // Kiểm tra xung đột (loại trừ suất chiếu hiện tại)
+    const [conflicts] = await db.query(`
+      SELECT ScreeningID FROM Screening
+      WHERE RoomID = ?
+        AND StartTime < ?
+        AND EndTime > ?
+        AND ScreeningID != ?
+    `, [roomID, endTime, startTime, screeningID]);
+
+    if (conflicts.length > 0) {
+      req.session.adminError = 'Phòng này đã có suất chiếu trùng giờ. Vui lòng chọn giờ hoặc phòng khác.';
+      return res.redirect('/admin/screenings');
+    }
+
+    await db.query(
+      'UPDATE Screening SET MovieID = ?, RoomID = ?, StartTime = ?, EndTime = ?, BasePrice = ? WHERE ScreeningID = ?',
+      [movieID, roomID, startTime, endTime, parseFloat(basePrice), screeningID]
+    );
+
+    req.session.adminSuccess = 'Cập nhật suất chiếu thành công!';
+    res.redirect('/admin/screenings');
+  } catch (err) {
+    console.error('Screening update error:', err);
+    req.session.adminError = 'Lỗi server: ' + err.message;
     res.redirect('/admin/screenings');
   }
 });
@@ -177,10 +281,17 @@ router.get('/admin/bookings', requireAdmin, async (req, res) => {
     `);
 
     for (let i = 0; i < bookings.length; i++) {
-      const [tickets] = await db.query(
-        'SELECT * FROM Ticket WHERE BookingID = ?', [bookings[i].BookingID]
-      );
-      bookings[i].Seats = tickets.map(t => `${t.Row}${t.Number}`).join(', ');
+      const [tickets] = await db.query(`
+        SELECT t.*, COALESCE(st.SeatType, 'Regular') AS SeatType
+        FROM Ticket t
+        LEFT JOIN Seat st ON t.RoomID = st.RoomID AND t.Row = st.Row AND t.Number = st.Number
+        WHERE t.BookingID = ?
+      `, [bookings[i].BookingID]);
+      bookings[i].Seats = tickets.map(t => {
+        const num = t.SeatType === 'Couple Seat' ? (t.Number + 1) / 2 : t.Number;
+        return `${t.Row}${num}`;
+      }).join(', ');
+    
       bookings[i].TotalPrice = tickets.reduce((sum, t) => sum + parseFloat(t.Price), 0);
     }
 
@@ -188,6 +299,17 @@ router.get('/admin/bookings', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send('Lỗi server');
+  }
+});
+
+router.post('/admin/bookings/:id/delete', requireAdmin, async (req, res) => {
+  try {
+    await db.query('DELETE FROM Ticket WHERE BookingID = ?', [req.params.id]);
+    await db.query('DELETE FROM Booking WHERE BookingID = ?', [req.params.id]);
+    res.redirect('/admin/bookings');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/bookings');
   }
 });
 
@@ -199,6 +321,24 @@ router.get('/admin/users', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send('Lỗi server');
+  }
+});
+
+router.post('/admin/users/:id/delete', requireAdmin, async (req, res) => {
+  try {
+    const uid = req.params.id;
+    // Xóa dữ liệu liên quan trước
+    const [bookings] = await db.query('SELECT BookingID FROM Booking WHERE UserID = ?', [uid]);
+    for (const b of bookings) {
+      await db.query('DELETE FROM Ticket WHERE BookingID = ?', [b.BookingID]);
+    }
+    await db.query('DELETE FROM Booking WHERE UserID = ?', [uid]);
+    await db.query('DELETE FROM Comment WHERE UserID = ?', [uid]);
+    await db.query('DELETE FROM User WHERE UserID = ? AND Role != ?', [uid, 'Admin']);
+    res.redirect('/admin/users');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/users');
   }
 });
 

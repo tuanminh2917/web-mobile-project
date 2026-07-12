@@ -10,5 +10,7 @@ backend/database/db.js
 *.txt
 *_extracted/
 fix*.js
+reset_db.js
 test*.js
 backend/sessions/
+/app/

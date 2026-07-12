@@ -1,46 +1,128 @@
-import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
-import { MovieVerticalCard } from '@/components/movie-card';
+import { Movie } from '@/types';
+import { api, getFullImageUrl } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
-// 1. Tính toán kích thước card để vừa khít 2 cột
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-// Tổng khoảng trống hai bên và ở giữa: padding left/right (Spacing.four * 2) + khoảng cách giữa 2 card (Spacing.three)
-const TOTAL_PADDING = Spacing.four * 2 + Spacing.three; 
+const TOTAL_PADDING = Spacing.four * 2 + Spacing.three;
 const CARD_WIDTH = (Math.min(SCREEN_WIDTH, MaxContentWidth) - TOTAL_PADDING) / 2;
-const CARD_HEIGHT = CARD_WIDTH * 1.4; // Tỷ lệ poster phim chuẩn
+const CARD_HEIGHT = CARD_WIDTH * 1.4;
 
+// =============================================
+// MOVIE CARD — Vertical (grid 2 cột)
+// =============================================
+function MovieVerticalCard({ movie }: { movie: Movie }) {
+  const router = useRouter();
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && { opacity: 0.8 }]}
+      onPress={() => router.push(`/movie/${movie.MovieID}`)}
+    >
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: getFullImageUrl(movie.PosterURL) }}
+          style={styles.movieImage}
+          contentFit="cover"
+          placeholder={{ thumbhash: undefined }}
+          transition={300}
+        />
+        {/* Badge kiểm duyệt */}
+        <View style={styles.censorBadge}>
+          <Text style={styles.censorText}>{movie.Censorship || 'P'}</Text>
+        </View>
+      </View>
+      <Text style={styles.movieTitle} numberOfLines={2}>{movie.Title}</Text>
+      <Text style={styles.movieMeta} numberOfLines={1}>{movie.Genre} · {movie.Duration} phút</Text>
+    </Pressable>
+  );
+}
+
+// =============================================
+// MAIN SCREEN
+// =============================================
 export default function MainPageScreen() {
+  const [nowShowing, setNowShowing] = useState<Movie[]>([]);
+  const [comingSoon, setComingSoon] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // useEffect — chạy khi mount (slide 05: Running Only on the First Render)
+  useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      const [now, coming] = await Promise.all([
+        api.getNowShowing(),
+        api.getComingSoon(),
+      ]);
+      if (isMounted) {
+        setNowShowing(now);
+        setComingSoon(coming);
+        setLoading(false);
+      }
+    };
+    load();
+    // cleanup (Effect Cleanup từ slide 05)
+    return () => { isMounted = false; };
+  }, []);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.safeArea, styles.centered]}>
+        <ActivityIndicator size="large" color={Colors.dark.buttonPrimary} />
+        <Text style={styles.loadingText}>Đang tải phim...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView 
-        style={styles.container} 
-        contentContainerStyle={styles.contentContainer}
+      <FlatList
+        data={[]}
+        keyExtractor={() => 'dummy'}
+        renderItem={null}
         showsVerticalScrollIndicator={false}
-      >
-        {/* SECTION: PHIM ĐANG CHIẾU */}
-        <View style={styles.movieSection}>
-          <Text style={styles.movieSectionText}>Phim đang chiếu</Text>
-          <View style={styles.movieGrid}>
-            <MovieVerticalCard title="Tên Phim 1" imageUrl="/path/to/movie-poster-1.jpg" />
-            <MovieVerticalCard title="Tên Phim 2" imageUrl="/path/to/movie-poster-2.jpg" />
-            <MovieVerticalCard title="Tên Phim 3" imageUrl="/path/to/movie-poster-3.jpg" />
-            <MovieVerticalCard title="Tên Phim 4" imageUrl="/path/to/movie-poster-4.jpg" />
-          </View>
-        </View>
+        contentContainerStyle={styles.contentContainer}
+        ListHeaderComponent={() => (
+          <>
+            {/* Header */}
+            <View style={styles.pageHeader}>
+              <Text style={styles.brandName}>🎬 <Text style={{ color: Colors.dark.buttonPrimary }}>C</Text>inema</Text>
+            </View>
 
-        {/* SECTION: PHIM SẮP CHIẾU */}
-        <View style={styles.movieSection}>
-          <Text style={styles.movieSectionText}>Phim sắp chiếu</Text>
-          <View style={styles.movieGrid}>
-            <MovieVerticalCard title="Tên Phim 1" imageUrl="/path/to/movie-poster-1.jpg" />
-            <MovieVerticalCard title="Tên Phim 2" imageUrl="/path/to/movie-poster-2.jpg" />
-            <MovieVerticalCard title="Tên Phim 3" imageUrl="/path/to/movie-poster-3.jpg" />
-            <MovieVerticalCard title="Tên Phim 4" imageUrl="/path/to/movie-poster-4.jpg" />
-          </View>
-        </View>
-      </ScrollView>
+            {/* PHIM ĐANG CHIẾU */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Phim đang chiếu</Text>
+              <View style={styles.movieGrid}>
+                {nowShowing.map(movie => (
+                  <MovieVerticalCard key={movie.MovieID} movie={movie} />
+                ))}
+              </View>
+            </View>
+
+            {/* PHIM SẮP CHIẾU */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Phim sắp chiếu</Text>
+              <View style={styles.movieGrid}>
+                {comingSoon.map(movie => (
+                  <MovieVerticalCard key={movie.MovieID} movie={movie} />
+                ))}
+              </View>
+            </View>
+          </>
+        )}
+      />
     </SafeAreaView>
   );
 }
@@ -50,8 +132,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.dark.background,
   },
-  container: {
-    flex: 1,
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  loadingText: {
+    color: Colors.dark.textSecondary,
+    fontSize: 14,
   },
   contentContainer: {
     paddingHorizontal: Spacing.four,
@@ -60,11 +148,18 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
-  movieSection: {
-    width: '100%',
-    marginTop: Spacing.four,
+  pageHeader: {
+    paddingVertical: Spacing.three,
   },
-  movieSectionText: {
+  brandName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: Colors.dark.text,
+  },
+  section: {
+    marginTop: Spacing.three,
+  },
+  sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: Colors.dark.text,
@@ -73,30 +168,41 @@ const styles = StyleSheet.create({
   movieGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start', // Căn đều từ trái qua
-    gap: Spacing.three,          // Khoảng cách giữa các hàng và các cột
+    gap: Spacing.three,
   },
-  movieCard: {
+  // MovieVerticalCard
+  card: {
     width: CARD_WIDTH,
-    marginBottom: Spacing.two,    // Khoảng cách phụ dưới chân mỗi card
   },
   imageContainer: {
     width: '100%',
     height: CARD_HEIGHT,
     borderRadius: 12,
     backgroundColor: Colors.dark.backgroundElement,
-    // Hiệu ứng đổ bóng đổ khối hiện đại
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
   },
   movieImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
-    borderRadius: 12,
+  },
+  censorBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: Colors.dark.buttonPrimary,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  censorText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   movieTitle: {
     fontSize: 14,
@@ -104,5 +210,10 @@ const styles = StyleSheet.create({
     color: Colors.dark.text,
     marginTop: Spacing.two,
     lineHeight: 18,
+  },
+  movieMeta: {
+    fontSize: 12,
+    color: Colors.dark.textSecondary,
+    marginTop: 2,
   },
 });

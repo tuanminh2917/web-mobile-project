@@ -29,13 +29,17 @@ class SeatMap {
     const cacheKey = `${rowLabel}-${seatNum}`;
     if (this.seatTypes[cacheKey]) return this.seatTypes[cacheKey];
 
-    const maxRows = this.options.rows;
-    const lastRow = maxRows - 1;
-    const midStart = Math.floor(maxRows * 0.4);
-    const midEnd = Math.floor(maxRows * 0.7);
-
-    if (rowIdx === lastRow) return 'couple';
-    if (rowIdx >= midStart && rowIdx < midEnd) return 'vip';
+    const tot = this.options.rows;
+    // Phòng lớn (10 hàng): A-D Regular, E-H VIP, I-J Couple
+    // Phòng nhỏ (8 hàng):  A-C Regular, D-F VIP,  G-H Couple
+    if (tot === 10) {
+      if (rowIdx >= 8) return 'couple';
+      if (rowIdx >= 4) return 'vip';
+      return 'regular';
+    }
+    // tot === 8 (phòng nhỏ)
+    if (rowIdx >= 6) return 'couple';
+    if (rowIdx >= 3) return 'vip';
     return 'regular';
   }
 
@@ -67,18 +71,21 @@ class SeatMap {
         const seatNum = s + 1;
         const rowLabel = this.rowLabels[r];
         const type = this.getSeatType(r, s, rowLabel, seatNum);
+        const isCouple = type === 'couple';
         const occupied = this.isOccupied(rowLabel, seatNum);
+        // Hàng đôi: chỉ hiện 5 ghế, số 1→5, bỏ vị trí chẵn
+        if (isCouple && seatNum % 2 === 0) continue;
+        const displayNum = isCouple ? (seatNum + 1) / 2 : seatNum;
 
-        const isSmall = r >= this.options.rows - 2;
         const seat = document.createElement('div');
-        seat.className = `seat ${type}${isSmall ? ' small' : ''}`;
+        seat.className = `seat ${type}`;
         if (occupied) seat.classList.add('occupied');
         seat.dataset.row = rowLabel;
         seat.dataset.number = seatNum;
         seat.dataset.type = type;
         seat.dataset.price = this.priceMap[type] || this.priceMap.regular;
-        seat.title = `${rowLabel}${seatNum} - ${this.getTypeLabel(type)}`;
-        seat.textContent = seatNum;
+        seat.title = `${rowLabel}${displayNum} - ${this.getTypeLabel(type)}`;
+        seat.textContent = displayNum;
 
         row.appendChild(seat);
       }
@@ -148,7 +155,7 @@ class SeatMap {
     summaryEl.innerHTML = `
       <h3>Ghế đã chọn (${seats.length})</h3>
       <div class="selected-list">
-        ${seats.map(s => `<span class="selected-seat">${s.row}${s.number} - ${this.getTypeLabel(s.type)} - ${s.price.toLocaleString()}đ</span>`).join('')}
+        ${seats.map(s => `<span class="selected-seat">${s.row}${s.type === 'couple' ? (s.number + 1) / 2 : s.number} - ${this.getTypeLabel(s.type)} - ${s.price.toLocaleString()}đ</span>`).join('')}
       </div>
       <div class="total">
         <span>Tổng cộng</span>

@@ -61,8 +61,14 @@
                   </span>
                 </td>
                 <td class="actions">
-                  <button class="edit-btn">Sửa</button>
-                  <button class="delete-btn" onclick="if(confirm('Xóa người dùng?'))alert('Đã xóa')">Xóa</button>
+                  <button class="edit-btn" onclick="alert('Tính năng đổi role/thông tin đang phát triển')">Sửa</button>
+                  <% if (u.Role !== 'Admin') { %>
+                    <form action="/admin/users/<%= u.UserID %>/delete" method="POST" style="display:inline;" onsubmit="return confirm('Xóa người dùng <%= u.Username %>? Sẽ xóa luôn mọi đặt vé và bình luận của họ.');">
+                      <button type="submit" class="delete-btn">Xóa</button>
+                    </form>
+                  <% } else { %>
+                    <button class="delete-btn" style="opacity:0.4;cursor:not-allowed;" disabled>Xóa</button>
+                  <% } %>
                 </td>
               </tr>
             <% }); %>

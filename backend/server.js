@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const bcrypt = require('bcrypt');
@@ -24,11 +23,10 @@ app.use(cookieParser());
 
 // Session
 app.use(session({
-  store: new FileStore({ path: path.join(__dirname, 'sessions') }),
   secret: 'cinema-booking-secret-key-2026',
   cookie: { maxAge: 15 * 60000 },
   saveUninitialized: true,
-  resave: false
+  resave: true
 }));
 
 // Make user available to all views
@@ -39,7 +37,7 @@ app.use((req, res, next) => {
 
 // View counter middleware
 app.use(async (req, res, next) => {
-  if (req.path.startsWith('/assets') || req.path.startsWith('/js')) return next();
+  if (req.path.startsWith('/assets') || req.path.startsWith('/js') || req.path.startsWith('/api')) return next();
   try {
     const db = require('./database/db');
     await db.query('UPDATE SystemStats SET ViewCount = ViewCount + 1, LastUpdated = CURRENT_TIMESTAMP WHERE StatID = 1');
@@ -53,6 +51,10 @@ const movieRoutes = require('./routes/movies');
 const bookingRoutes = require('./routes/bookings');
 const adminRoutes = require('./routes/admin');
 const contactRoutes = require('./routes/contact');
+const apiRoutes = require('./routes/api');
+
+// Mount JSON API cho mobile app
+app.use('/api', apiRoutes);
 
 app.use(authRoutes);
 app.use(movieRoutes);
@@ -121,6 +123,7 @@ app.use((req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  if (res.headersSent) return next(err);
   res.status(500).send('500 - Lỗi server');
 });
 

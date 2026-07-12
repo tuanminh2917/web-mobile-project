@@ -128,7 +128,8 @@ INSERT INTO Movie (Title, Genre, Director, Actor, Languages, Censorship, Duratio
 ('Avengers: Endgame', 'Hành động', 'Anthony Russo', 'Robert Downey Jr., Chris Evans', 'Phụ đề', 'T13', 181, '2019-04-26', 'Stoped', 'Trận chiến cuối cùng của các siêu anh hùng.', '/assets/avengers-poster.jpg'),
 ('Dune: Part Two', 'Khoa học viễn tưởng', 'Denis Villeneuve', 'Timothée Chalamet, Zendaya', 'Phụ đề', 'T13', 166, '2026-06-15', 'Up Coming', 'Hành trình của Paul Atreides tại Arrakis.', '/assets/dune-poster.jpg');
 
--- Generate seats for Large rooms (1,2): 10 rows (A-J), 15 seats/row
+-- Generate seats for Large rooms (1,2): 10 rows (A-J) x 10 seats/row = 100
+-- A-D: Regular, E-H: VIP, I-J: Couple Seat
 INSERT INTO Seat (RoomID, Row, Number, SeatType)
 SELECT r.RoomID, lbl, num,
   CASE
@@ -142,21 +143,20 @@ CROSS JOIN (SELECT 'A' AS lbl UNION SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'
             UNION SELECT 'I' UNION SELECT 'J') row_data
 CROSS JOIN (SELECT 1 AS num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
             UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8
-            UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
-            UNION SELECT 13 UNION SELECT 14 UNION SELECT 15) nums;
+            UNION SELECT 9 UNION SELECT 10) nums;
 
--- Generate seats for Small rooms (3,4,5): 10 rows (A-J), 10 seats/row
+-- Generate seats for Small rooms (3,4,5): 8 rows (A-H) x 10 seats/row = 80
+-- A-C: Regular, D-F: VIP, G-H: Couple Seat
 INSERT INTO Seat (RoomID, Row, Number, SeatType)
 SELECT r.RoomID, lbl, num,
   CASE
-    WHEN lbl IN ('I', 'J') THEN 'Couple Seat'
-    WHEN lbl IN ('E', 'F', 'G', 'H') THEN 'VIP'
+    WHEN lbl IN ('G', 'H') THEN 'Couple Seat'
+    WHEN lbl IN ('D', 'E', 'F') THEN 'VIP'
     ELSE 'Regular'
   END
 FROM (SELECT 3 AS RoomID UNION SELECT 4 UNION SELECT 5) r
 CROSS JOIN (SELECT 'A' AS lbl UNION SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'
-            UNION SELECT 'E' UNION SELECT 'F' UNION SELECT 'G' UNION SELECT 'H'
-            UNION SELECT 'I' UNION SELECT 'J') row_data
+            UNION SELECT 'E' UNION SELECT 'F' UNION SELECT 'G' UNION SELECT 'H') row_data
 CROSS JOIN (SELECT 1 AS num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4
             UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8
             UNION SELECT 9 UNION SELECT 10) nums;
@@ -166,17 +166,21 @@ INSERT INTO User (FullName, DateOfBirth, Email, Phone, Username, Password, Role)
 ('Nguyễn Văn A', '1995-01-01', 'vana@gmail.com', '0912345678', 'admin01', '$2b$10$Urv0qIqJYR4JDnssfgub7ei7td4nzBZdC1nJUYRssBl7qs9N3Q/AK', 'Admin'),
 ('Trần Thị B', '2000-05-15', 'thib@gmail.com', '0987654321', 'client01', '$2b$10$qfprUt8dTMFBbP29sMIoSuGL/QEJ4L.KmEp6XBcN0cB46Pm5PRqAq', 'Client');
 
--- Screenings (today + next few days)
+-- Screenings (ngày 30/08/2026)
 INSERT INTO Screening (MovieID, RoomID, StartTime, EndTime, BasePrice) VALUES
-(1, 1, DATE_ADD(CURDATE(), INTERVAL 9 HOUR), DATE_ADD(CURDATE(), INTERVAL 11 HOUR), 50000),
-(1, 1, DATE_ADD(CURDATE(), INTERVAL 14 HOUR), DATE_ADD(CURDATE(), INTERVAL 16 HOUR), 60000),
-(1, 1, DATE_ADD(CURDATE(), INTERVAL 19 HOUR), DATE_ADD(CURDATE(), INTERVAL 21 HOUR), 80000),
-(1, 1, DATE_ADD(CURDATE(), INTERVAL 22 HOUR), DATE_ADD(CURDATE(), INTERVAL 24 HOUR), 100000),
-(2, 3, DATE_ADD(CURDATE(), INTERVAL 10 HOUR), DATE_ADD(CURDATE(), INTERVAL 12 HOUR), 50000),
-(2, 3, DATE_ADD(CURDATE(), INTERVAL 15 HOUR), DATE_ADD(CURDATE(), INTERVAL 17 HOUR), 60000),
-(2, 3, DATE_ADD(CURDATE(), INTERVAL 19 HOUR) + INTERVAL 30 MINUTE, DATE_ADD(CURDATE(), INTERVAL 21 HOUR) + INTERVAL 30 MINUTE, 90000),
-(1, 2, DATE_ADD(CURDATE(), INTERVAL 9 HOUR) + INTERVAL 30 MINUTE, DATE_ADD(CURDATE(), INTERVAL 11 HOUR) + INTERVAL 30 MINUTE, 50000),
-(1, 2, DATE_ADD(CURDATE(), INTERVAL 20 HOUR), DATE_ADD(CURDATE(), INTERVAL 22 HOUR), 85000);
+(1, 1, '2026-08-30 08:00:00', '2026-08-30 10:15:00', 80000),
+(1, 1, '2026-08-30 13:00:00', '2026-08-30 15:15:00', 90000),
+(1, 1, '2026-08-30 18:00:00', '2026-08-30 20:15:00', 100000),
+(1, 2, '2026-08-30 09:30:00', '2026-08-30 11:45:00', 80000),
+(1, 2, '2026-08-30 15:00:00', '2026-08-30 17:15:00', 90000),
+(1, 2, '2026-08-30 20:30:00', '2026-08-30 22:45:00', 110000),
+(2, 3, '2026-08-30 08:30:00', '2026-08-30 10:30:00', 75000),
+(2, 3, '2026-08-30 11:30:00', '2026-08-30 13:30:00', 75000),
+(2, 3, '2026-08-30 14:30:00', '2026-08-30 16:30:00', 85000),
+(2, 3, '2026-08-30 19:00:00', '2026-08-30 21:00:00', 95000),
+(2, 4, '2026-08-30 10:00:00', '2026-08-30 12:00:00', 75000),
+(2, 4, '2026-08-30 16:00:00', '2026-08-30 18:00:00', 85000),
+(2, 4, '2026-08-30 21:00:00', '2026-08-30 23:00:00', 95000);
 
 -- SystemStats
 INSERT INTO SystemStats (ViewCount) VALUES (0);

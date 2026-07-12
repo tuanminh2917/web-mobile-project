@@ -35,18 +35,23 @@ router.get('/showtime', async (req, res) => {
       JOIN Movie m ON s.MovieID = m.MovieID
       JOIN Room r ON s.RoomID = r.RoomID
       WHERE s.StartTime >= NOW()
+        AND m.Status = 'On Going'
       ORDER BY s.StartTime ASC
       LIMIT 20
     `);
     screenings = s;
   } catch (err) { console.error('DB screenings:', err.message); }
 
-  const dates = [];
-  for (let i = 0; i < 5; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    dates.push(d.toISOString().split('T')[0]);
-  }
+  const allDates = new Set();
+  screenings.forEach(scr => {
+    const d = new Date(scr.StartTime);
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).formatToParts(d);
+    const year = parts.find(p => p.type === 'year').value;
+    const month = parts.find(p => p.type === 'month').value;
+    const day = parts.find(p => p.type === 'day').value;
+    allDates.add(`${year}-${month}-${day}`);
+  });
+  const dates = Array.from(allDates).sort();
 
   res.render('showtime', {
     currentPage: 'showtime',
@@ -81,13 +86,17 @@ router.get('/movies/:id', async (req, res) => {
       screeningByRoom[key].push(s);
     });
 
-    // Get dates
-    const dates = [];
-    for (let i = 0; i < 5; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      dates.push(d.toISOString().split('T')[0]);
-    }
+    // Get dates dynamically from screenings
+    const allDates = new Set();
+    screenings.forEach(scr => {
+      const d = new Date(scr.StartTime);
+      const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).formatToParts(d);
+      const year = parts.find(p => p.type === 'year').value;
+      const month = parts.find(p => p.type === 'month').value;
+      const day = parts.find(p => p.type === 'day').value;
+      allDates.add(`${year}-${month}-${day}`);
+    });
+    const dates = Array.from(allDates).sort();
 
     // Get comments
     const [comments] = await db.query(`
@@ -156,10 +165,16 @@ router.get('/my-tickets', async (req, res) => {
     // Get tickets for each booking
     for (let i = 0; i < bookings.length; i++) {
       const [tickets] = await db.query(`
-        SELECT * FROM Ticket WHERE BookingID = ?
+        SELECT t.*, COALESCE(st.SeatType, 'Regular') AS SeatType
+        FROM Ticket t
+        LEFT JOIN Seat st ON t.RoomID = st.RoomID AND t.Row = st.Row AND t.Number = st.Number
+        WHERE t.BookingID = ?
       `, [bookings[i].BookingID]);
 
-      bookings[i].Seats = tickets.map(t => `${t.Row}${t.Number}`).join(', ');
+      bookings[i].Seats = tickets.map(t => {
+        const num = t.SeatType === 'Couple Seat' ? (t.Number + 1) / 2 : t.Number;
+        return `${t.Row}${num}`;
+      }).join(', ');
       bookings[i].TotalPrice = tickets.reduce((sum, t) => sum + parseFloat(t.Price), 0);
     }
 

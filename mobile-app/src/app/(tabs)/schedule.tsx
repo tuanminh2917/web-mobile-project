@@ -1,81 +1,141 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
-import type { MovieProps } from '@/components/movie-card';
-import { MovieHorizontalCard as MovieCard } from '@/components/movie-card';
-
+import { Screening } from '@/types';
+import { api, formatTime, formatPrice, formatDateShort, getFullImageUrl } from '@/services/api';
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
-const movies: MovieProps[] = [
-  {
-    title: 'LEVITICUS: BÓNG QUỶ-T18',
-    format: '2D',
-    imageUrl: '/path/to/movie-poster-1.jpg',
-    screeningList: ['18:25', '20:00', '22:15', '23:30'],
-  },
-  {
-    title: 'TÊN PHIM 2: ĐẠI CHIẾN-T13',
-    format: '3D',
-    imageUrl: '/path/to/movie-poster-2.jpg',
-    screeningList: ['11:00', '14:00', '17:00'],
-  },
-];
-
+// =============================================
+// SCHEDULE SCREEN — Lịch chiếu phim
+// =============================================
 export default function ScheduleScreen() {
+  const router = useRouter();
+  const [screenings, setScreenings] = useState<Screening[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeStatus, setActiveStatus] = useState<string>('');
+
+  // load screenings khi mount
+  useEffect(() => {
+    let isMounted = true;
+    api.getScreenings().then(data => {
+      if (isMounted) {
+        setScreenings(data);
+        setLoading(false);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
+
+  // Filter theo trạng thái (useCallback — slide 05)
+  const filtered = screenings.filter(s => {
+    if (!activeStatus) return true;
+    return s.MovieStatus === activeStatus;
+  });
+
+  // Render từng suất chiếu
+  const renderItem = useCallback(({ item }: { item: Screening }) => (
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
+      onPress={() => router.push(`/book/${item.ScreeningID}`)}
+    >
+      {/* Poster */}
+      <View style={styles.posterContainer}>
+        <Image
+          source={{ uri: getFullImageUrl(item.PosterURL) }}
+          style={styles.poster}
+          contentFit="cover"
+          transition={300}
+        />
+      </View>
+
+      {/* Info */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.movieTitle} numberOfLines={2}>{item.MovieTitle}</Text>
+        <Text style={styles.metaText}>{item.RoomName} · {item.SeatType || '2D'}</Text>
+        <Text style={styles.metaText}>{item.Genre} · {item.Duration} phút</Text>
+
+        <View style={styles.timePriceRow}>
+          <View style={styles.timeBadge}>
+            <Text style={styles.timeText}>{formatTime(item.StartTime)} - {formatDateShort(item.StartTime)}</Text>
+          </View>
+          <Text style={styles.priceText}>{formatPrice(item.BasePrice)}</Text>
+        </View>
+      </View>
+
+      {/* Nút chọn ghế */}
+      <Pressable
+        style={({ pressed }) => [styles.bookBtn, pressed && { opacity: 0.8 }]}
+        onPress={() => router.push(`/book/${item.ScreeningID}`)}
+      >
+        <Text style={styles.bookBtnText}>Chọn ghế</Text>
+      </Pressable>
+    </Pressable>
+  ), [router]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
-        data={movies}
-        keyExtractor={(item, index) => `${item.title}-${index}`}
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
+        data={filtered}
+        keyExtractor={item => `${item.ScreeningID}`}
+        renderItem={renderItem}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
+        ItemSeparatorComponent={() => <View style={{ height: Spacing.three }} />}
         ListHeaderComponent={() => (
           <>
-            <Text style={styles.title}>Lịch chiếu phim</Text>
-            <View style={styles.dayList}>
-              <ScreenDayBtn date="Today" active={true} />
-              <ScreenDayBtn date="Tomorrow" active={false} />
+            <Text style={styles.pageTitle}>Lịch chiếu phim</Text>
+
+            {/* Status tabs */}
+            <View style={styles.statusTabs}>
+              {[
+                { label: 'Đang chiếu', value: 'On Going' },
+              ].map(tab => (
+                <Pressable
+                  key={tab.value}
+                  style={[styles.statusTab, activeStatus === tab.value && styles.statusTabActive]}
+                  onPress={() => setActiveStatus(tab.value)}
+                >
+                  <Text style={[
+                    styles.statusTabText,
+                    activeStatus === tab.value && styles.statusTabTextActive,
+                  ]}>
+                    {tab.label}
+                  </Text>
+                </Pressable>
+              ))}
             </View>
+
+            {loading && (
+              <View style={{ alignItems: 'center', paddingVertical: Spacing.five }}>
+                <ActivityIndicator size="large" color={Colors.dark.buttonPrimary} />
+              </View>
+            )}
           </>
         )}
-        renderItem={({ item }) => (
-          <MovieCard
-            title={item.title}
-            format={item.format}
-            imageUrl={item.imageUrl}
-            screeningList={item.screeningList}
-          />
-        )}
-        ItemSeparatorComponent={() => <View style={styles.movieSeparator} />}
+        ListEmptyComponent={() => !loading ? (
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyText}>Không có suất chiếu nào</Text>
+          </View>
+        ) : null}
       />
     </SafeAreaView>
-  );
-}
-
-function ScreenDayBtn({ date, active }: { date: string; active?: boolean }) {
-  return (
-    <Pressable style={({ pressed }) => [
-      styles.dayButton, 
-      active && styles.dayButtonActive,
-      pressed && styles.dayButtonPressed
-    ]}>
-      <Text style={[styles.dayButtonText, active && styles.dayButtonTextActive]}>{date}</Text>
-    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    alignItems: 'stretch',
     backgroundColor: Colors.dark.background,
-  },
-  container: {
-    flex: 1,
-    width: '100%',
   },
   contentContainer: {
     paddingHorizontal: Spacing.four,
@@ -84,59 +144,113 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
-  title: {
+  pageTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: Colors.dark.text,
-    marginTop: 16,
-    marginBottom: Spacing.two,
+    marginTop: Spacing.three,
+    marginBottom: Spacing.three,
   },
-  dayList: {
+  statusTabs: {
     flexDirection: 'row',
-    gap: Spacing.three,
-    marginBottom: Spacing.four,
+    gap: Spacing.two,
+    marginBottom: Spacing.three,
   },
-  dayButton: {
+  statusTab: {
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     borderRadius: 20,
     backgroundColor: Colors.dark.backgroundElement,
     borderWidth: 1,
     borderColor: Colors.dark.backgroundSelected,
   },
-  dayButtonActive: {
+  statusTabActive: {
     backgroundColor: Colors.dark.buttonPrimary,
     borderColor: Colors.dark.buttonPrimary,
   },
-  dayButtonPressed: {
-    opacity: 0.85,
-  },
-  dayButtonText: {
+  statusTabText: {
     color: Colors.dark.textSecondary,
     fontWeight: '600',
+    fontSize: 13,
   },
-  dayButtonTextActive: {
-    color: Colors.dark.buttonTextOnPrimary,
+  statusTabTextActive: {
+    color: '#fff',
   },
-  movieSeparator: {
-    height: Spacing.four,
+  // Screening card
+  card: {
+    flexDirection: 'row',
+    backgroundColor: Colors.dark.backgroundElement,
+    borderRadius: 12,
+    padding: Spacing.two,
+    borderWidth: 1,
+    borderColor: Colors.dark.backgroundSelected,
+    alignItems: 'center',
+    gap: Spacing.two,
   },
-  movieContainer: {
-    gap: Spacing.four,
+  posterContainer: {
+    width: 70,
+    height: 100,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: Colors.dark.backgroundSelected,
   },
-  // Khối bọc ngang chuẩn ảnh mẫu
+  poster: {
+    width: '100%',
+    height: '100%',
+  },
+  infoContainer: {
+    flex: 1,
+    gap: 4,
+  },
   movieTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     color: Colors.dark.text,
-    marginBottom: 6,
-    width: '90%', // Tránh đè lên tag 2D
   },
-  sectionSubtitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
+  metaText: {
+    fontSize: 12,
+    color: Colors.dark.textSecondary,
+  },
+  timePriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    marginTop: 4,
+  },
+  timeBadge: {
+    backgroundColor: Colors.dark.backgroundSelected,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  timeText: {
     color: Colors.dark.text,
-    marginTop: 12,
-    marginBottom: 8,
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  priceText: {
+    color: Colors.dark.buttonPrimary,
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  bookBtn: {
+    backgroundColor: Colors.dark.buttonPrimary,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  bookBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+  emptyBox: {
+    alignItems: 'center',
+    paddingVertical: Spacing.six,
+  },
+  emptyText: {
+    color: Colors.dark.textSecondary,
+    fontSize: 15,
   },
 });
